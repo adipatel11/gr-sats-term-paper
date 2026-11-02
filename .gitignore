@@ -19,6 +19,9 @@ AditPatel_BiomedicalML_CSE_8673/Reference papers/
 *.synctex.gz
 *.toc
 
+# Experiment outputs (features, logits, results); keep them on Google Drive instead
+code/outputs/
+
 # Python
 __pycache__/
 *.pyc
