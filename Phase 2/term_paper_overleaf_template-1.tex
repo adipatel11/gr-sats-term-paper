@@ -1,0 +1,964 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{url}
+\usepackage{hyperref}
+
+\begin{document}
+
+% =========================================================
+% TITLE AND AUTHORS
+% =========================================================
+
+\title{Your Proposed Research Title}
+
+\author{
+\IEEEauthorblockN{Student Name 1, Student Name 2, Student Name 3}
+\IEEEauthorblockA{
+Department of Computer Science and Engineering\\
+Mississippi State University\\
+Starkville, MS, USA\\
+\{email1, email2, email3\}@msstate.edu
+}
+{\color{blue} For Phase 2, update all black-colored content in this template within your existing Overleaf project.}}
+
+\maketitle
+
+
+
+% =========================================================
+% ABSTRACT
+% =========================================================
+
+\begin{abstract}
+
+% Address the following in approximately 150--200 words:
+%
+% 1. CONTEXT:
+%    What general research area does this work address?
+%
+% 2. PROBLEM:
+%    What specific problem is being studied?
+%
+% 3. GAP:
+%    What important limitation remains in existing work?
+%
+% 4. PROPOSED APPROACH:
+%    What method/model/framework do you propose?
+%
+% 5. EVALUATION:
+%    What dataset(s), baselines, and metrics will be used?
+%
+% 6. EXPECTED/FINAL RESULT:
+%    During the proposal stage, state what you intend to evaluate.
+%    In the final paper, replace this with quantitative results.
+%
+% 7. CONTRIBUTION:
+%    What is the main contribution of the study?
+%
+% NOTE:
+% Do not make unsupported claims such as
+% "our method significantly outperforms existing methods"
+% until experimental evidence is available.
+
+[Write your abstract here.]
+
+\end{abstract}
+
+
+\begin{IEEEkeywords}
+machine learning, [keyword 2], [keyword 3], [keyword 4]
+\end{IEEEkeywords}
+
+
+% =========================================================
+% I. INTRODUCTION
+% =========================================================
+
+\section{Introduction}
+
+% ---------------------------------------------------------
+% Paragraph 1: Background and Context
+% ---------------------------------------------------------
+%
+% Address:
+% - What is the broader application/research area?
+% - What ML problem is involved?
+% - Why does this problem matter?
+% - Who or what benefits from solving it?
+% - Support important claims with references.
+
+[Introduce the research area and application context.]
+
+
+% ---------------------------------------------------------
+% Paragraph 2: Importance of the Problem
+% ---------------------------------------------------------
+%
+% Address:
+% - What is the specific problem?
+% - Why is solving it important?
+% - What happens if the problem is not addressed?
+% - Can its importance be quantified?
+%
+% Examples of useful evidence:
+% - error rates
+% - class imbalance
+% - computational cost
+% - robustness issues
+% - latency
+% - fairness
+% - generalization
+% - data scarcity
+% - interpretability
+
+[Explain the specific problem and its importance.]
+
+
+% ---------------------------------------------------------
+% Paragraph 3: Existing Work
+% ---------------------------------------------------------
+%
+% Address:
+% - What approaches have already been used?
+% - What are the strongest/relevant existing methods?
+% - What have previous studies achieved?
+%
+% Cite the most relevant papers.
+
+[Briefly summarize existing approaches.]
+
+
+% ---------------------------------------------------------
+% Paragraph 4: Research Gap
+% ---------------------------------------------------------
+%
+% Clearly identify the gap.
+%
+% Use evidence from the literature rather than simply stating:
+% "No one has done this before."
+%
+% A strong gap statement should establish:
+%
+% Existing literature -> limitation -> consequence -> need
+%
+% Example structure:
+% Although existing methods achieve ______,
+% they remain limited by ______.
+% This limitation becomes important when ______.
+% Therefore, there is a need for ______.
+
+[State the research gap.]
+
+
+% ---------------------------------------------------------
+% Paragraph 5: Proposed Solution
+% ---------------------------------------------------------
+%
+% Address:
+% - What do you propose?
+% - Which gap/challenge does it address?
+% - Why should the proposed approach help?
+
+[Introduce the proposed approach.]
+
+
+% ---------------------------------------------------------
+% Contributions
+% ---------------------------------------------------------
+
+The main contributions of this work are summarized as follows:
+
+\begin{itemize}
+
+    \item \textbf{Contribution 1:}
+    [State the first specific contribution.]
+
+    \item \textbf{Contribution 2:}
+    [State the second specific contribution.]
+
+    \item \textbf{Contribution 3:}
+    [State the third specific contribution.]
+
+\end{itemize}
+
+% IMPORTANT:
+% Contributions should describe what YOUR study contributes,
+% not general statements such as:
+% "We study machine learning."
+%
+% Each contribution should eventually be supported by
+% experiments, analysis, or theoretical results.
+
+
+% =========================================================
+% II. RELATED WORK
+% =========================================================
+
+\section{Related Work}
+
+% Organize related work by METHODS/CHALLENGES rather than
+% writing one paragraph per paper.
+%
+% Possible structure:
+%
+% A. Traditional ML Approaches
+% B. Deep Learning Approaches
+% C. Recent/State-of-the-Art Approaches
+%
+% For every group of papers discuss:
+%
+% 1. What problem do they address?
+% 2. What dataset do they use?
+% 3. What method do they use?
+% 4. What evaluation metrics are reported?
+% 5. What are their important findings?
+% 6. What limitations remain?
+%
+% The objective is NOT only to summarize papers.
+% The objective is to establish the research gap.
+
+\subsection{Existing Approaches}
+
+[Discuss the major categories of existing methods.]
+
+
+\subsection{Limitations of Existing Work}
+
+[Compare the limitations that motivate your proposed study.]
+
+
+% ---------------------------------------------------------
+% Literature Comparison Table
+% ---------------------------------------------------------
+
+\begin{table*}[t]
+\centering
+\caption{Comparison of Representative Related Works}
+\label{tab:literature}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{lllllll}
+\toprule
+\textbf{Reference} &
+\textbf{Dataset} &
+\textbf{Method} &
+\textbf{Task} &
+\textbf{Metrics} &
+\textbf{Key Finding} &
+\textbf{Limitation / Gap} \\
+\midrule
+
+Paper 1 & Dataset & Method & Task & Metric & Finding & Gap \\
+
+Paper 2 & Dataset & Method & Task & Metric & Finding & Gap \\
+
+Paper 3 & Dataset & Method & Task & Metric & Finding & Gap \\
+
+Paper 4 & Dataset & Method & Task & Metric & Finding & Gap \\
+
+Paper 5 & Dataset & Method & Task & Metric & Finding & Gap \\
+.... & .... & .... & .... & .... & .... \\
+\bottomrule
+\end{tabular}}
+\end{table*}
+
+
+% =========================================================
+% III. RESEARCH CHALLENGES AND MOTIVATION
+% =========================================================
+
+\section{Research Challenges and Motivation}
+
+% Identify THREE important challenges derived from your
+% literature survey.
+%
+% Each challenge MUST contain:
+%
+% 1. What is the challenge?
+% 2. Evidence that the challenge exists.
+% 3. Why is it important?
+% 4. Why is it technically difficult?
+% 5. Which existing methods are affected?
+% 6. What happens if it is not addressed?
+% 7. Which proposed component will address it?
+
+
+\subsection{Challenge 1: [Challenge Name]}
+
+\textbf{Problem:}
+[Precisely define the challenge.]
+
+\textbf{Evidence from literature:}
+[Cite papers/results demonstrating the problem.]
+
+\textbf{Importance:}
+[Explain why addressing this challenge matters.]
+
+\textbf{Technical difficulty:}
+[Explain specifically why this challenge is difficult.]
+
+\textbf{Connection to proposed method:}
+[Identify the proposed component intended to address it.]
+
+
+\subsection{Challenge 2: [Challenge Name]}
+
+\textbf{Problem:}
+[Define Challenge 2.]
+
+\textbf{Evidence from literature:}
+[Provide supporting evidence and citations.]
+
+\textbf{Importance:}
+[Explain importance.]
+
+\textbf{Technical difficulty:}
+[Explain technical difficulty.]
+
+\textbf{Connection to proposed method:}
+[Identify the corresponding proposed technique.]
+
+
+\subsection{Challenge 3: [Challenge Name]}
+
+\textbf{Problem:}
+[Define Challenge 3.]
+
+\textbf{Evidence from literature:}
+[Provide supporting evidence and citations.]
+
+\textbf{Importance:}
+[Explain importance.]
+
+\textbf{Technical difficulty:}
+[Explain technical difficulty.]
+
+\textbf{Connection to proposed method:}
+[Identify the corresponding proposed technique.]
+
+
+% =========================================================
+% IV. PROPOSED METHODOLOGY
+% =========================================================
+
+\section{Proposed Methodology}
+
+% Start this section with the overall research idea.
+%
+% Answer:
+% - What is being proposed?
+% - What is the input?
+% - What is the output?
+% - What are the major components?
+% - How do the components interact?
+
+%%% More details 
+% Explain the complete method from INPUT to OUTPUT.
+%
+% Address:
+%
+% 1. What data enters the system?
+% 2. What preprocessing is performed?
+% 3. What features/representations are used?
+% 4. What is the baseline architecture?
+% 5. What new/modified component is proposed?
+% 6. Where is the proposed component inserted?
+% 7. What does each component mathematically/functionally do?
+% 8. Which research challenge does each component address?
+% 9. What loss/objective function is optimized?
+% 10. What output does the model produce?
+% 11. How is inference/prediction performed?
+% 12. Why was this design chosen instead of alternatives?
+%
+
+
+
+\subsection{Problem Formulation}
+
+% Clearly define:
+%
+% Input:
+% X = ?
+%
+% Output/target:
+% y = ?
+%
+% Dataset:
+% D = {(x_i,y_i)}?
+%
+% Learning objective:
+% classification / regression / clustering / forecasting /
+% representation learning / etc.
+%
+% Define mathematical notation when appropriate.
+
+[Formulate the ML problem.]
+
+
+\subsection{Overall Framework}
+
+% INSERT A SYSTEM/METHOD DIAGRAM.
+%
+% Recommended flow:
+%
+% Raw Data
+%    ->
+% Preprocessing
+%    ->
+% Feature Representation
+%    ->
+% Baseline/Proposed Model
+%    ->
+% Prediction
+%    ->
+% Evaluation
+%
+% Every major block in the figure must be explained in text.
+
+\begin{figure}[htbt]
+    \centering
+    % \includegraphics[width=\columnwidth]{figures/framework.pdf}
+    \fbox{
+        \parbox[c][3cm][c]{0.9\columnwidth}{
+        \centering
+        Insert proposed methodology / ML pipeline diagram here
+        }
+    }
+    \caption{Overview of the proposed methodology.}
+    \label{fig:framework}
+\end{figure}
+
+
+\subsection{Proposed Components}
+
+% Explain each component.
+%
+% For EACH proposed component answer:
+%
+% 1. What does it do?
+% 2. What input does it receive?
+% 3. What output does it produce?
+% 4. Which research challenge does it address?
+% 5. Why was this technique selected?
+% 6. How is it different from the baseline/existing approach?
+
+[Describe the proposed components.]
+
+
+% ---------------------------------------------------------
+% Challenge-to-Method Mapping
+% ---------------------------------------------------------
+
+\begin{table}[t]
+\centering
+\caption{Mapping Between Research Challenges and Proposed Methods}
+\label{tab:challenge_method}
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{llll}
+\toprule
+\textbf{Challenge} &
+\textbf{Technique} &
+\textbf{Function} &
+\textbf{Expected Effect} \\
+\midrule
+
+Challenge 1 & Technique 1 & [Function] & [Effect] \\
+
+Challenge 2 & Technique 2 & [Function] & [Effect] \\
+
+Challenge 3 & Technique 3 & [Function] & [Effect] \\
+
+\bottomrule
+\end{tabular}}
+\end{table}
+
+
+% =========================================================
+% V. EXPERIMENTAL METHODOLOGY
+% =========================================================
+
+
+
+
+
+% =========================================================
+% VII. SIX-WEEK EXECUTION PLAN
+% =========================================================
+
+\section{Project Execution Plan}
+
+
+%=========================================================
+% VII. SIX-WEEK RESEARCH AND IMPLEMENTATION PLAN
+% =========================================================
+
+\subsection{Six-Week Research and Implementation Plan}
+
+% Provide a realistic six-week plan for completing the proposed study.
+%
+% The plan should demonstrate how the project progresses from
+% literature analysis and baseline implementation to the proposed
+% method, experiments, analysis, and final manuscript.
+%
+% For EACH week, specify:
+%
+% 1. Research/technical objective
+% 2. Specific tasks to be completed
+% 3. Expected measurable output/deliverable
+% 4. Team member(s) responsible
+%
+% Avoid vague descriptions such as:
+% "Work on model," "Do experiments," or "Write paper."
+%
+% Tasks should be specific and verifiable.
+%
+% Example:
+% Weak: "Implement models."
+%
+% Better:
+% "Implement logistic regression and random forest baselines,
+% evaluate using stratified 5-fold cross-validation, and report
+% Accuracy, Precision, Recall, and F1-score."
+
+
+\begin{table*}[h!]
+\centering
+\caption{Six-Week Research and Implementation Plan Example}
+\label{tab:six_week_plan}
+\renewcommand{\arraystretch}{1.25}
+
+\begin{tabular}{
+p{0.05\textwidth}
+p{0.16\textwidth}
+p{0.31\textwidth}
+p{0.28\textwidth}
+p{0.12\textwidth}
+}
+\toprule
+
+\textbf{Week} &
+\textbf{Objective} &
+\textbf{Specific Tasks} &
+\textbf{Expected Output / Milestone} &
+\textbf{Member(s)} \\
+
+\midrule
+
+1 &
+Problem and data preparation &
+Finalize research questions and hypotheses; finalize dataset;
+implement preprocessing; define train/validation/test protocol;
+identify evaluation metrics. &
+Reproducible dataset pipeline; finalized research questions;
+dataset statistics and experimental protocol. &
+[Names] \\
+
+\midrule
+
+2 &
+Baseline establishment &
+Implement selected baseline methods; verify implementations;
+perform initial training and evaluation using the same
+experimental protocol planned for the proposed method. &
+Baseline performance table; initial plots; verified baseline
+implementation. &
+[Names] \\
+
+\midrule
+
+3 &
+Proposed method implementation &
+Implement the proposed technique/component(s);
+integrate them with the existing data pipeline;
+perform debugging and preliminary experiments. &
+Working implementation of proposed method;
+preliminary results demonstrating successful execution. &
+[Names] \\
+
+\midrule
+
+4 &
+Main experiments &
+Train and evaluate the proposed method;
+perform hyperparameter selection;
+compare against baselines using the predefined metrics;
+repeat experiments where necessary. &
+Main experimental results; comparison tables;
+performance figures. &
+[Names] \\
+
+\midrule
+
+5 &
+Analysis and validation &
+Conduct ablation study, error/failure analysis,
+robustness or sensitivity analysis where appropriate;
+analyze why the proposed method improves or fails. &
+Ablation/error analysis; final figures and tables;
+evidence supporting or rejecting the research hypothesis. &
+[Names] \\
+
+\midrule
+
+6 &
+Finalization and reproducibility &
+Complete remaining experiments; verify reproducibility;
+interpret results; identify limitations;
+finalize manuscript, figures, references, and presentation. &
+Reproducible final results; completed IEEE-style manuscript;
+final presentation/poster. &
+[Names] \\
+
+\bottomrule
+\end{tabular}
+
+\end{table*}
+% =========================================================
+% VIII. TEAM MEMBER CONTRIBUTIONS
+% =========================================================
+
+\section{Team Member Contributions}
+
+% Clearly state each person's responsibilities.
+%
+% Avoid:
+% "Everyone worked equally."
+%
+% Instead identify concrete contributions:
+%
+% - literature survey
+% - dataset preparation
+% - preprocessing
+% - baseline implementation
+% - proposed algorithm
+% - experiments
+% - statistical analysis
+% - visualization
+% - manuscript preparation
+
+\begin{itemize}
+
+    \item \textbf{Student 1:}
+    [Specific contributions.]
+
+    \item \textbf{Student 2:}
+    [Specific contributions.]
+
+    \item \textbf{Student 3:}
+    [Specific contributions.]
+
+\end{itemize}
+
+
+\newpage
+
+\color{red}
+\section{Experimental Methodology}
+
+
+\subsection{Dataset}
+
+% Provide:
+%
+% Dataset name:
+% Dataset source/URL:
+% Public/private:
+% Number of samples:
+% Number of features:
+% Number of classes/targets:
+% Class distribution:
+% Missing values:
+% Data modality:
+%     tabular/image/text/audio/time-series/etc.
+%
+% Explain why this dataset is suitable for the research question.
+
+[Describe the dataset.]
+
+
+\subsection{Data Preprocessing}
+
+% Explain ALL relevant preprocessing:
+%
+% - missing-value handling
+% - normalization/standardization
+% - categorical encoding
+% - resizing
+% - tokenization
+% - augmentation
+% - feature extraction
+% - outlier treatment
+% - class balancing
+%
+% Avoid data leakage.
+%
+% Clearly state which operations are learned only from
+% the training set.
+
+[Describe preprocessing.]
+
+
+\subsection{Data Splitting and Validation}
+
+% Specify:
+%
+% Training set: ___%
+% Validation set: ___%
+% Test set: ___%
+%
+% OR
+%
+% K-fold cross-validation with K = ___
+%
+% Explain WHY this evaluation strategy is appropriate.
+%
+% For imbalanced classification, consider stratification.
+% For time-series data, do not randomly mix future samples
+% into the training set.
+
+[Describe the validation protocol.]
+
+
+\subsection{Baseline Methods}
+
+% Include meaningful comparison methods.
+%
+% Recommended:
+%
+% Baseline 1: simple/traditional baseline
+% Baseline 2: stronger ML/DL baseline
+% Baseline 3: relevant recent method
+%
+% Explain why each baseline is included.
+
+\begin{itemize}
+
+    \item \textbf{Baseline 1:} [Method and justification.]
+
+    \item \textbf{Baseline 2:} [Method and justification.]
+
+    \item \textbf{Baseline 3:} [Method and justification.]
+
+\end{itemize}
+
+
+\subsection{Implementation Details}
+
+% Report enough information to make the work reproducible:
+%
+% Programming language:
+% ML framework:
+% Hardware:
+% Optimizer:
+% Learning rate:
+% Batch size:
+% Number of epochs:
+% Loss function:
+% Random seed(s):
+% Hyperparameter search:
+% Early stopping:
+%
+% Include only parameters relevant to your study.
+
+[Provide implementation details.]
+
+
+\subsection{Evaluation Metrics}
+
+% List the PRIMARY and SECONDARY evaluation metrics.
+%
+% Classification examples:
+% Accuracy, Precision, Recall, F1-score, AUROC
+%
+% Regression examples:
+% MAE, MSE, RMSE, R^2
+%
+% Clustering examples:
+% Silhouette score, ARI, NMI
+%
+% Explain WHY the selected metrics are appropriate.
+%
+% Do not report accuracy alone for a highly imbalanced
+% classification problem without justification.
+
+[Define and justify evaluation metrics.]
+
+
+% =========================================================
+% VI. RESULTS AND ANALYSIS
+% =========================================================
+
+\section{Results and Analysis}
+
+% PROPOSAL STAGE:
+% Leave the numerical entries blank or write "To be evaluated."
+%
+% FINAL PAPER:
+% Replace with actual experimental results.
+
+
+\subsection{Main Results}
+
+\begin{table}[t]
+\centering \color{red}
+\caption{Performance Comparison}
+\label{tab:results}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Method} &
+\textbf{Metric 1} &
+\textbf{Metric 2} &
+\textbf{Metric 3} \\
+\midrule
+
+Baseline 1 & -- & -- & -- \\
+Baseline 2 & -- & -- & -- \\
+Baseline 3 & -- & -- & -- \\
+Proposed Method & -- & -- & -- \\
+
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+% For each major result discuss:
+%
+% 1. What was observed?
+% 2. How large is the improvement/degradation?
+% 3. Why might this behavior occur?
+% 4. Does it support the original hypothesis?
+% 5. How does it compare with the baseline?
+%
+% Do not only repeat numbers from the table.
+
+[Analyze the main results.]
+
+
+\subsection{Ablation Study}
+
+% If your proposed approach contains multiple components,
+% evaluate their individual contributions.
+%
+% Example:
+%
+% Baseline
+% Baseline + Component A
+% Baseline + Component B
+% Full proposed method
+
+\begin{table}[t]
+\centering \color{red}
+\caption{Ablation Study}
+\label{tab:ablation}
+\begin{tabular}{lc}
+\toprule
+\textbf{Configuration} & \textbf{Primary Metric} \\
+\midrule
+
+Baseline & -- \\
++ Component A & -- \\
++ Component B & -- \\
+Full Proposed Method & -- \\
+
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\subsection{Error and Failure Analysis}
+
+% Investigate WHERE the model fails.
+%
+% Possible analyses:
+%
+% - confusion matrix
+% - difficult classes
+% - false positives/false negatives
+% - performance across subgroups
+% - sensitivity to noise
+% - sensitivity to training size
+% - robustness
+% - outliers
+%
+% Explain what the failures reveal about the model.
+
+[Provide error/failure analysis.]
+
+
+
+% =========================================================
+% IX. USE OF GENERATIVE AI / LLMs
+% =========================================================
+
+
+\section{Use of Generative AI and LLM Tools}
+
+% Disclose any use of ChatGPT, Copilot, Gemini,
+% Claude, or other generative-AI/LLM tools.
+%
+% Address:
+%
+% 1. Tool/model used:
+%
+% 2. What was it used for?
+%    Examples:
+%    - brainstorming
+%    - literature organization
+%    - code assistance
+%    - debugging
+%    - writing assistance
+%    - LaTeX formatting
+%
+% 3. Which parts of the work were AI-assisted?
+%
+% 4. How were generated outputs verified?
+%
+% 5. Were references/citations independently verified?
+%
+% 6. Were experimental results generated by your actual
+%    implementation rather than accepted from an LLM?
+%
+% Students remain responsible for the correctness of
+% submitted content.
+
+
+[Provide your disclosure here.]
+
+
+% =========================================================
+% X. CONCLUSION
+% =========================================================
+
+\section{Conclusion}
+
+% PROPOSAL:
+% Summarize:
+% - problem
+% - identified gap
+% - proposed solution
+% - planned evaluation
+% - expected contribution
+%
+% FINAL PAPER:
+% Replace expected outcomes with actual findings,
+% limitations, and possible future work.
+
+[Write the conclusion.]
+
+
+% =========================================================
+% REFERENCES
+% =========================================================
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}

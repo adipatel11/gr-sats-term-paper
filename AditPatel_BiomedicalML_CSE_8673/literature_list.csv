@@ -1,0 +1,83 @@
+bib_key,first_author,year,title,venue,s2_citations_2026_10_03,relation_to_seeds,taxonomy_branch,most_relevant
+pleiss2017fairness,Pleiss,2017,On Fairness and Calibration,NeurIPS 2017,1039,keyword search,Group-aware: theory and limits,yes
+ovadia2019trust,Ovadia,2019,Can You Trust Your Model's Uncertainty? Evaluating Predictive Uncertainty Under Dataset Shift,NeurIPS 2019,2508,cited by DAC; cited by Roschewitz25,Evaluation: shift benchmarks,yes
+tomani2021posthoc,Tomani,2021,Post-hoc Uncertainty Calibration for Domain Drift Scenarios,CVPR 2021,98,cited by DAC; cited by Roschewitz25; Connected Papers graph of DAC,"Post-hoc, shift-aware",yes
+salvador2022faircal,Salvador,2022,FairCal: Fairness Calibration for Face Verification,ICLR 2022,23,keyword search,"Post-hoc, group-aware",yes
+yu2022multidomain,Yu,2022,Robust Calibration with Multi-domain Temperature Scaling,NeurIPS 2022,58,cited by DAC; cited by Roschewitz25; Connected Papers graph of DAC,"Post-hoc, shift-aware",yes
+mehta2023evaluating,Mehta,2023,Evaluating the Fairness of Deep Learning Uncertainty Estimates in Medical Image Analysis,MIDL 2023,28,keyword search,Evaluation: calibration audits by group,yes
+riccilara2023calibration,Ricci Lara,2023,Towards Unraveling Calibration Biases in Medical Image Analysis,FAIMI @ MICCAI 2023,11,keyword search,Evaluation: calibration audits by group,yes
+shui2023clusterfocal,Shui,2023,Mitigating Calibration Bias Without Fixed Attribute Grouping for Improved Fairness in Medical Imaging Analysis,MICCAI 2023,,keyword search,Train-time,yes
+tomani2023dac,Tomani,2023,Beyond In-Domain Scenarios: Robust Density-Aware Calibration,ICML 2023,25,seed,"Post-hoc, shift-aware",yes
+yuksekgonul2023atypicality,Yuksekgonul,2023,Beyond Confidence: Reliable Models Should Also Consider Atypicality,NeurIPS 2023,32,cited by Roschewitz25,"Post-hoc, shift-aware",yes
+disalvo2024medmnistc,Di Salvo,2024,MedMNIST-C: Comprehensive Benchmark and Improved Classifier Robustness by Simulating Realistic Image Corruptions,ADSMI @ MICCAI 2024,27,keyword search,Evaluation: shift benchmarks,yes
+jin2024fairmedfm,Jin,2024,FairMedFM: Fairness Benchmarking for Medical Imaging Foundation Models,NeurIPS 2024 D&B,87,seed,Evaluation: fairness audits,yes
+wang2024cascaded,Wang,2024,Domain-Adaptive and Subgroup-Specific Cascaded Temperature Regression for Out-of-Distribution Calibration,ICASSP 2024,1,cites Tomani21,"Post-hoc, shift-aware",yes
+yang2024limits,Yang,2024,The Limits of Fair Medical Imaging AI in Real-World Generalization,Nature Medicine 2024,322,keyword search; Connected Papers graph of FairMedFM,Evaluation: fairness audits,yes
+dominique2025calibration,Dominique,2025,On the Role of Calibration in Benchmarking Algorithmic Fairness for Skin Cancer Detection,MELBA 2025,1,cites FairMedFM,Evaluation: calibration audits by group,yes
+roschewitz2025where,Roschewitz,2025,Where are we with calibration under dataset shift in image classification?,TMLR 2025,6,cites DAC,"Post-hoc, shift-aware; Evaluation: shift benchmarks",yes
+shen2025calin,Shen,2025,Exposing and Mitigating Calibration Biases and Demographic Unfairness in MLLM Few-Shot In-Context Learning for Medical Image Classification,MICCAI 2025,7,cites FairMedFM,"Post-hoc, group-aware",yes
+lin2026crsbench,Lin,2026,CRS-Bench: A Reference-Relative Reliability Benchmark for Medical Image Encoders,arXiv 2026 (submitted to WACV 2027),0,cites FairMedFM,Evaluation: foundation models,yes
+brier1950verification,Brier,1950,Verification of Forecasts Expressed in Terms of Probability,Monthly Weather Review 1950,6323,cited by Roschewitz25,Evaluation: metrics,
+platt1999probabilistic,Platt,1999,Probabilistic Outputs for Support Vector Machines and Comparisons to Regularized Likelihood Methods,Adv. Large Margin Classifiers 1999,7255,cited by DAC,"Post-hoc, global",
+zadrozny2002transforming,Zadrozny,2002,Transforming Classifier Scores into Accurate Multiclass Probability Estimates,KDD 2002,1872,cited by DAC; cited by Roschewitz25,"Post-hoc, global",
+naeini2015bbq,Naeini,2015,Obtaining Well Calibrated Probabilities Using Bayesian Binning,AAAI 2015,2122,cited by DAC,"Post-hoc, global",
+gal2016dropout,Gal,2016,Dropout as a Bayesian Approximation: Representing Model Uncertainty in Deep Learning,ICML 2016,13078,cited by DAC,Train-time,
+he2016resnet,He,2016,Deep Residual Learning for Image Recognition,CVPR 2016,,project backbone (Phase 0),Setting: backbones,
+guo2017calibration,Guo,2017,On Calibration of Modern Neural Networks,ICML 2017,10186,cited by DAC; cited by Roschewitz25,"Post-hoc, global",
+kleinberg2017inherent,Kleinberg,2017,Inherent Trade-Offs in the Fair Determination of Risk Scores,ITCS 2017,,keyword search,Group-aware: theory and limits,
+lakshminarayanan2017ensembles,Lakshminarayanan,2017,Simple and Scalable Predictive Uncertainty Estimation using Deep Ensembles,NeurIPS 2017,8735,cited by DAC; cited by Roschewitz25,Train-time,
+hebertjohnson2018multicalibration,Hebert-Johnson,2018,Multicalibration: Calibration for the (Computationally-Identifiable) Masses,ICML 2018,,keyword search,"Post-hoc, group-aware",
+tschandl2018ham10000,Tschandl,2018,"The HAM10000 Dataset, a Large Collection of Multi-Source Dermatoscopic Images of Common Pigmented Skin Lesions",Scientific Data 2018,3779,cited by FairMedFM,Setting: datasets,
+hendrycks2019benchmarking,Hendrycks,2019,Benchmarking Neural Network Robustness to Common Corruptions and Perturbations,ICLR 2019,4814,cited by DAC; cited by Roschewitz25,Evaluation: shift benchmarks,
+irvin2019chexpert,Irvin,2019,CheXpert: A Large Chest Radiograph Dataset with Uncertainty Labels and Expert Comparison,AAAI 2019,3820,cited by FairMedFM; cited by Roschewitz25,Setting: datasets,
+kull2019dirichlet,Kull,2019,Beyond Temperature Scaling: Obtaining Well-Calibrated Multiclass Probabilities with Dirichlet Calibration,NeurIPS 2019,599,cited by DAC,"Post-hoc, global",
+kumar2019verified,Kumar,2019,Verified Uncertainty Calibration,NeurIPS 2019,,keyword search,Evaluation: metrics,
+liu2019implicit,Liu,2019,The Implicit Fairness Criterion of Unconstrained Learning,ICML 2019,,keyword search,Group-aware: theory and limits,
+muller2019labelsmoothing,Muller,2019,When Does Label Smoothing Help?,NeurIPS 2019,2521,cited by DAC; cited by Roschewitz25,Train-time,
+nixon2019measuring,Nixon,2019,Measuring Calibration in Deep Learning,CVPR Workshops 2019,748,cited by Roschewitz25,Evaluation: metrics,
+thulasidasan2019mixup,Thulasidasan,2019,On Mixup Training: Improved Calibration and Predictive Uncertainty for Deep Neural Networks,NeurIPS 2019,649,cited by DAC,Train-time,
+mukhoti2020focal,Mukhoti,2020,Calibrating Deep Neural Networks using Focal Loss,NeurIPS 2020,674,cited by Roschewitz25,Train-time,
+sagawa2020groupdro,Sagawa,2020,Distributionally Robust Neural Networks for Group Shifts: On the Importance of Regularization for Worst-Case Generalization,ICLR 2020,1836,cited by FairMedFM,Train-time,
+wang2020transferable,Wang,2020,Transferable Calibration with Lower Bias and Variance in Domain Adaptation,NeurIPS 2020,70,cited by DAC,"Post-hoc, shift-aware",
+zhang2020mixnmatch,Zhang,2020,Mix-n-Match: Ensemble and Compositional Methods for Uncertainty Calibration in Deep Learning,ICML 2020,302,cited by DAC; cited by Roschewitz25; Connected Papers graph of DAC,"Post-hoc, global",
+dosovitskiy2021vit,Dosovitskiy,2021,An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale,ICLR 2021,70809,cited by DAC; cited by Roschewitz25,Setting: backbones,
+gong2021confidence,Gong,2021,Confidence Calibration for Domain Generalization under Covariate Shift,ICCV 2021,40,cited by DAC,"Post-hoc, shift-aware",
+groh2021fitzpatrick,Groh,2021,Evaluating Deep Neural Networks Trained on Clinical Images in Dermatology with the Fitzpatrick 17k Dataset,CVPR Workshops 2021,,keyword search,Setting: datasets,
+gupta2021splines,Gupta,2021,Calibration of Neural Networks using Splines,ICLR 2021,139,cited by DAC; cited by Roschewitz25; Connected Papers graph of DAC,"Post-hoc, global",
+minderer2021revisiting,Minderer,2021,Revisiting the Calibration of Modern Neural Networks,NeurIPS 2021,630,cited by DAC,Evaluation: shift benchmarks,
+radford2021clip,Radford,2021,Learning Transferable Visual Models From Natural Language Supervision,ICML 2021,56749,cited by FairMedFM; cited by Roschewitz25,Setting: backbones,
+seyyedkalantari2021underdiagnosis,Seyyed-Kalantari,2021,Underdiagnosis Bias of Artificial Intelligence Algorithms Applied to Chest Radiographs in Under-Served Patient Populations,Nature Medicine 2021,955,cited by FairMedFM,Evaluation: fairness audits,
+wald2021calibration,Wald,2021,On Calibration and Out-of-Domain Generalization,NeurIPS 2021,184,cited by DAC,Evaluation: shift benchmarks,
+gruber2022proper,Gruber,2022,Better Uncertainty Calibration via Proper Scores for Classification and Beyond,NeurIPS 2022,88,cited by Roschewitz25; cites Tomani21; Connected Papers graph of DAC,Evaluation: metrics,
+hu2022lora,Hu,2022,LoRA: Low-Rank Adaptation of Large Language Models,ICLR 2022,23779,cited by FairMedFM,Setting: adaptation,
+idrissi2022simple,Idrissi,2022,Simple Data Balancing Achieves Competitive Worst-Group-Accuracy,CLeaR 2022,245,cited by FairMedFM,Train-time,
+kumar2022finetuning,Kumar,2022,Fine-Tuning can Distort Pretrained Features and Underperform Out-of-Distribution,ICLR 2022,1047,keyword search,Train-time,
+liu2022margin,Liu,2022,The Devil is in the Margin: Margin-based Label Smoothing for Network Calibration,CVPR 2022,124,cites Tomani21; Connected Papers graph of DAC,Train-time,
+roelofs2022mitigating,Roelofs,2022,Mitigating Bias in Calibration Error Estimation,AISTATS 2022,,keyword search,Evaluation: metrics,
+schrouff2022diagnosing,Schrouff,2022,Diagnosing Failures of Fairness Transfer Across Distribution Shift in Real-World Medical Settings,NeurIPS 2022,84,keyword search,Evaluation: fairness audits,
+sun2022knn,Sun,2022,Out-of-Distribution Detection with Deep Nearest Neighbors,ICML 2022,939,cited by DAC,"Post-hoc, shift-aware",
+tomani2022pts,Tomani,2022,Parameterized Temperature Scaling for Boosting the Expressive Power in Post-Hoc Uncertainty Calibration,ECCV 2022,72,cited by DAC,"Post-hoc, global",
+zhang2022improving,Zhang,2022,Improving the Fairness of Chest X-ray Classifiers,CHIL 2022,109,cited by FairMedFM; Connected Papers graph of FairMedFM,Evaluation: fairness audits,
+khan2023fair,Khan,2023,How Fair are Medical Imaging Foundation Models?,ML4H 2023,21,cited by FairMedFM; Connected Papers graph of FairMedFM,Evaluation: foundation models,
+moor2023generalist,Moor,2023,Foundation Models for Generalist Medical Artificial Intelligence,Nature 2023,2203,cited by FairMedFM,Setting: backbones,
+nguyen2023lvmmed,Nguyen,2023,LVM-Med: Learning Large-Scale Self-Supervised Vision Models for Medical Imaging via Second-order Graph Matching,NeurIPS 2023,107,cited by FairMedFM,Setting: backbones,
+wang2023survey,Wang,2023,Calibration in Deep Learning: A Survey of the State-of-the-Art,arXiv 2023 (survey),118,cites DAC,Survey,
+zong2023medfair,Zong,2023,MEDFAIR: Benchmarking Fairness for Medical Imaging,ICLR 2023,115,cited by FairMedFM; Connected Papers graph of FairMedFM,Evaluation: fairness audits,
+zou2023ace,Zou,2023,Adaptive Calibrator Ensemble: Navigating Test Set Difficulty in Out-of-Distribution Scenarios,ICCV 2023,13,cites Tomani21; Connected Papers graph of DAC,"Post-hoc, shift-aware",
+dutt2024fairtune,Dutt,2024,FairTune: Optimizing Parameter Efficient Fine Tuning for Fairness in Medical Image Analysis,ICLR 2024,32,cited by FairMedFM; Connected Papers graph of FairMedFM,Train-time,
+kim2024energy,Kim,2024,Uncertainty Calibration with Energy Based Instance-wise Scaling in the Wild Dataset,ECCV 2024,5,cites DAC; cites Tomani21; cited by Roschewitz25; Connected Papers graph of DAC,"Post-hoc, shift-aware",
+ktena2024generative,Ktena,2024,Generative Models Improve Fairness of Medical Classifiers under Distribution Shifts,Nature Medicine 2024,223,cited by FairMedFM,Evaluation: fairness audits,
+murugesan2024robust,Murugesan,2024,Robust Calibration of Large Vision-Language Adapters,ECCV 2024,39,keyword search,Train-time,
+oh2024calibrated,Oh,2024,Towards Calibrated Robust Fine-Tuning of Vision-Language Models,NeurIPS 2024,49,cites Tomani21,Train-time,
+oquab2024dinov2,Oquab,2024,DINOv2: Learning Robust Visual Features without Supervision,TMLR 2024,10906,cited by FairMedFM; cited by Roschewitz25,Setting: backbones,
+shi2024survey,Shi,2024,A Survey on Trustworthiness in Foundation Models for Medical Image Analysis,arXiv 2024 (survey),21,cites FairMedFM; cited by Roschewitz25,Survey,
+tu2024empirical,Tu,2024,An Empirical Study Into What Matters for Calibrating Vision-Language Models,ICML 2024,21,cites DAC,Evaluation: foundation models,
+abhishek2025quality,Abhishek,2025,Investigating the Quality of DermaMNIST and Fitzpatrick17k Dermatological Image Datasets,Scientific Data 2025,27,cites MedMNIST-C,Setting: datasets,
+hekler2025beyond,Hekler,2025,Beyond Overconfidence: Foundation Models Redefine Calibration in Deep Neural Networks,arXiv 2025,5,cites MedMNIST-C,Evaluation: foundation models,
+zhang2025biomedclip,Zhang,2025,A Multimodal Biomedical Foundation Model Trained from Fifteen Million Image-Text Pairs,NEJM AI 2025,316,cited by FairMedFM; cited by Roschewitz25,Setting: backbones,
+gupta2026subgroup,Gupta,2026,Subgroup Performance Analysis of Adaptation Strategies for Chest X-ray Foundation Models,arXiv 2026 (FAIMI 2026),0,cites FairMedFM,Evaluation: foundation models,
+huang2026uncertainty,Huang,2026,Uncertainty of Vision Medical Foundation Models,arXiv 2026,,keyword search,Evaluation: foundation models,
+xu2026demographic,Xu,2026,Demographic Calibration of Vision-Language Models for Dermatology,AISTATS 2026 Workshop,,keyword search,Evaluation: calibration audits by group,
+hekler2023tta,Hekler,2023,Test Time Augmentation Meets Post-hoc Calibration: Uncertainty Quantification under Real-World Conditions,AAAI 2023,,Connected Papers graph of DAC,"Post-hoc, shift-aware",
+yang2023beyond,Yang,2023,Beyond Probability Partitions: Calibrating Neural Networks with Semantic Aware Grouping,NeurIPS 2023,,Connected Papers graph of DAC,"Post-hoc, group-aware",
+tian2024fairdomain,Tian,2024,FairDomain: Achieving Fairness in Cross-Domain Medical Image Segmentation and Classification,ECCV 2024,,Connected Papers graph of FairMedFM,Table 1 only: fairness under shift,

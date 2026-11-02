@@ -1,0 +1,26 @@
+# macOS
+.DS_Store
+
+# Raw datasets (too big for GitHub, and their licenses don't allow redistribution)
+data/HAM10000/
+data/finalfitz17k/
+
+# Reference paper PDFs (about 270 MB, copyrighted). Re-download with get_reference_papers.py
+AditPatel_BiomedicalML_CSE_8673/Reference papers/
+
+# LaTeX build files
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.ipynb_checkpoints/

@@ -1,0 +1,227 @@
+%%
+%% CSE 8673 (Machine Learning), Fall 2026, Mississippi State University
+%% Term paper: 8-page conference draft, double column (ACM sigconf).
+%% Overleaf project name: AditPatel_BiomedicalML_CSE_8673
+%%
+%% Phase 0 set the title and abstract. Phase 1 added the literature survey
+%% (Sections 1 to 4), the paper list in literature_list.csv, and the two
+%% required sections at the end.
+%%
+%% Compile with pdfLaTeX + BibTeX (Overleaf default).
+%% "nonacm" removes the ACM copyright block and reference-format box,
+%% since this is a course paper and not an ACM submission.
+%%
+\documentclass[sigconf,nonacm]{acmart}
+
+\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+    Bib\TeX}}}
+
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage[edges]{forest}
+\usepackage{tabularx}
+
+%% Let a column end short instead of stretching the space between blocks.
+%% Without this the abstract column gets large gaps while sections are empty.
+\raggedbottom
+
+%% Page numbers, so the 2-page survey limit is easy to check.
+\settopmatter{printfolios=true}
+
+%% Marker for the most relevant papers in Table 1.
+\newcommand{\core}{\textsuperscript{$\star$}}
+
+\begin{document}
+
+\title{Group-Robust Shift-Aware Temperature Scaling for Adapted Medical
+  Foundation Models Under Image Corruption}
+
+\author{Adit Patel}
+\affiliation{%
+  \institution{Mississippi State University}
+  \department{Department of Computer Science and Engineering}
+  \city{Mississippi State}
+  \state{Mississippi}
+  \country{USA}}
+  \email{adp543@msstate.edu}
+
+\renewcommand{\shortauthors}{Patel}
+
+\begin{abstract}
+Medical foundation models are usually adapted to a new task with linear
+probing, LoRA, or full fine-tuning, and their predicted probabilities are
+then calibrated with temperature scaling on clean validation data. In
+practice, test images are often degraded by noise, blur, or changes in
+brightness and contrast, and this kind of shift can make a calibrator fit on
+clean data overconfident. Earlier work has found subgroup calibration gaps
+when models are moved to new datasets, but to my knowledge no work in
+medical imaging has looked at corruption severity, subgroup calibration, and
+adaptation strategy together. I propose Group-Robust Shift-Aware
+Temperature Scaling, a post-hoc calibrator that sets a per-image temperature
+from a standardized nearest-neighbor shift score and fits its two parameters
+to minimize the negative log-likelihood of the worst-off subgroup. Because the
+inverse temperature is linear in the shift score, the worst-group objective is
+convex. The calibrator needs no labels or group information at test time and
+never changes the predicted class. I will evaluate it on HAM10000 and
+Fitzpatrick17k using DINOv2 and BiomedCLIP backbones adapted by linear probing
+and LoRA, under MedMNIST-C corruptions at five severity levels, with CheXpert,
+an ImageNet-supervised ViT, and full fine-tuning as extensions. Each
+calibrator will be tested on corruption families it did not see during fitting
+and compared with clean and perturbation-based temperature scaling,
+density-aware calibration, atypicality-aware recalibration, and multi-domain,
+cluster-wise, and group-wise temperature scaling. Worst-group negative
+log-likelihood and Brier score will be the main metrics.
+\end{abstract}
+
+\begin{CCSXML}
+<ccs2012>
+ <concept>
+  <concept_id>10010147.10010257</concept_id>
+  <concept_desc>Computing methodologies~Machine learning</concept_desc>
+  <concept_significance>500</concept_significance>
+ </concept>
+ <concept>
+  <concept_id>10010405.10010444</concept_id>
+  <concept_desc>Applied computing~Life and medical sciences</concept_desc>
+  <concept_significance>300</concept_significance>
+ </concept>
+</ccs2012>
+\end{CCSXML}
+
+\ccsdesc[500]{Computing methodologies~Machine learning}
+\ccsdesc[300]{Applied computing~Life and medical sciences}
+
+\keywords{calibration, temperature scaling, distribution shift, image
+  corruption, fairness, subgroup robustness, medical foundation models}
+
+\maketitle
+
+\section{Introduction and Survey Scope}
+
+Medical foundation models are usually adapted to a task by linear probing, LoRA, or full fine-tuning before they are used \cite{hu2022lora,kumar2022finetuning,jin2024fairmedfm}. Their confidence scores only help clinicians if they are calibrated \cite{guo2017calibration}, but calibration gets worse under dataset shift such as image corruption \cite{ovadia2019trust} and can differ between patient groups \cite{riccilara2023calibration,dominique2025calibration}. My project asks whether a calibrator fit on clean data stays reliable as the corruption gets worse, and whether it fails more for some groups than for others. The rest of this survey covers the work behind that question, with a taxonomy of methods (Section~\ref{sec:taxonomy}), a timeline (Section~\ref{sec:chronology}), and four research gaps (Section~\ref{sec:gaps}).
+
+\begin{table*}[t]
+  \caption{Chronological overview in three strands. $\star$ marks the 18 papers most relevant to my project, and the seeds are in bold.}
+  \label{tab:chronology}
+  \scriptsize
+  \setlength{\tabcolsep}{4pt}
+  \renewcommand{\arraystretch}{1.0}
+  \begin{tabularx}{\textwidth}{@{}l>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    \textbf{Year} & \textbf{Calibration methods and shift} & \textbf{Group calibration and fairness} & \textbf{Medical benchmarks, data, and models} \\
+    \midrule
+    2017 & Temp.\ scaling \cite{guo2017calibration}, ensembles \cite{lakshminarayanan2017ensembles} & Calibration vs.\ parity \cite{pleiss2017fairness}\core, trade-offs \cite{kleinberg2017inherent} & \\
+    2018 & & Multicalibration \cite{hebertjohnson2018multicalibration} & HAM10000 \cite{tschandl2018ham10000} \\
+    2019 & Shift benchmark \cite{ovadia2019trust}\core, ImageNet-C \cite{hendrycks2019benchmarking} & Group calibration from plain training \cite{liu2019implicit} & CheXpert \cite{irvin2019chexpert} \\
+    2020 & Domain-adaptive calibration \cite{wang2020transferable} & GroupDRO \cite{sagawa2020groupdro} & \\
+    2021 & Perturbed-validation TS \cite{tomani2021posthoc}\core, multi-domain calibration \cite{gong2021confidence}, modern nets revisited \cite{minderer2021revisiting} & Underdiagnosis bias in chest X-rays \cite{seyyedkalantari2021underdiagnosis} & ViT \cite{dosovitskiy2021vit}, CLIP \cite{radford2021clip}, Fitzpatrick17k \cite{groh2021fitzpatrick} \\
+    2022 & Multi-domain TS \cite{yu2022multidomain}\core, parameterized TS \cite{tomani2022pts}, kNN OOD scores \cite{sun2022knn} & FairCal \cite{salvador2022faircal}\core, fairness transfer under shift \cite{schrouff2022diagnosing}, chest X-ray fairness \cite{zhang2022improving} & LoRA \cite{hu2022lora}, LP-FT \cite{kumar2022finetuning} \\
+    2023 & \textbf{DAC} \cite{tomani2023dac}\core, ACE \cite{zou2023ace}, atypicality \cite{yuksekgonul2023atypicality}\core, calibration survey \cite{wang2023survey}, test-time augmentation \cite{hekler2023tta} & Cluster-Focal \cite{shui2023clusterfocal}\core, calibration bias \cite{riccilara2023calibration}\core, uncertainty fairness \cite{mehta2023evaluating}\core, semantic grouping \cite{yang2023beyond} & MEDFAIR \cite{zong2023medfair}, LVM-Med \cite{nguyen2023lvmmed}, generalist medical AI \cite{moor2023generalist}, foundation model fairness \cite{khan2023fair} \\
+    2024 & Cascaded TS regression \cite{wang2024cascaded}\core, energy scaling \cite{kim2024energy}, adapted CLIP \cite{tu2024empirical,oh2024calibrated,murugesan2024robust} & Limits of fairness under shift \cite{yang2024limits}\core, FairTune \cite{dutt2024fairtune}, FairDomain \cite{tian2024fairdomain} & \textbf{FairMedFM} \cite{jin2024fairmedfm}\core, MedMNIST-C \cite{disalvo2024medmnistc}\core, DINOv2 \cite{oquab2024dinov2}, trustworthiness survey \cite{shi2024survey} \\
+    2025 & Real-shift benchmark \cite{roschewitz2025where}\core, foundation models \cite{hekler2025beyond} & CALIN \cite{shen2025calin}\core, skin cancer audit \cite{dominique2025calibration}\core & BiomedCLIP \cite{zhang2025biomedclip}, cleaned Fitzpatrick17k \cite{abhishek2025quality} \\
+    2026 & Encoder reliability, CRS-Bench \cite{lin2026crsbench}\core & Adapters and subgroup gaps \cite{gupta2026subgroup}, VLM skin-tone calibration \cite{xu2026demographic} & Medical foundation model uncertainty \cite{huang2026uncertainty} \\
+    \bottomrule
+  \end{tabularx}
+\end{table*}
+
+Both seed papers come from my Phase 0 plan. DAC \cite{tomani2023dac} is a post-hoc calibrator that uses nearest-neighbor distances in hidden features to stay calibrated under domain shift. FairMedFM \cite{jin2024fairmedfm} benchmarks the fairness of 20 foundation models, 11 of them for classification, under linear probing, parameter-efficient fine-tuning, and CLIP-based adaptation, and it reports the gap in expected calibration error (ECE) between groups. Broader surveys cover calibration in general \cite{wang2023survey} and trustworthy medical foundation models \cite{shi2024survey}. On 3 October 2026 the reference and citation lists of both seeds were pulled from the Semantic Scholar Graph API (Section~\ref{sec:llm}), along with the same lists for four related papers \cite{tomani2021posthoc,roschewitz2025where,disalvo2024medmnistc,salvador2022faircal}, about 450 records in all. Keyword searches added papers these lists missed. I kept papers on calibration, shift, subgroup fairness, or adapting medical foundation models, plus the backbones and datasets in Table~\ref{tab:chronology} and ResNet-50 \cite{he2016resnet} for a planned extension. I favored highly cited papers, top venues, and known experts, such as the groups of Buettner and Cremers, Glocker, Arbel, and Ghassemi. This left 82 papers, and the 18 marked with $\star$ in Table~\ref{tab:chronology} are the most relevant.
+
+\begin{figure}[t]
+  \centering
+  \begin{forest}
+    forked edges,
+    for tree={
+      grow=east,
+      reversed=true,
+      anchor=base west,
+      parent anchor=east,
+      child anchor=west,
+      font=\scriptsize,
+      rectangle,
+      draw=black!50,
+      rounded corners=1pt,
+      align=left,
+      inner xsep=2pt,
+      inner ysep=1pt,
+      s sep=1pt,
+      l sep=6pt,
+      fork sep=3pt,
+      line width=0.4pt,
+      edge={draw=black!50, line width=0.4pt},
+      ver/.style={rotate=90, child anchor=north, parent anchor=south, anchor=center},
+    },
+    where level=1{text width=42pt, fill=black!7}{},
+    where level=2{text width=156pt}{},
+    [{Calibration under shift and across groups}, ver, fill=black!12
+      [{Train-time}
+        [{Losses and mixup \cite{muller2019labelsmoothing,thulasidasan2019mixup,mukhoti2020focal,liu2022margin}}]
+        [{Ensembles and dropout \cite{gal2016dropout,lakshminarayanan2017ensembles}}]
+        [{Robust or calibration-aware fine-tuning \cite{kumar2022finetuning,oh2024calibrated,murugesan2024robust}}]
+        [{Group-robust training \cite{sagawa2020groupdro,idrissi2022simple,shui2023clusterfocal,dutt2024fairtune}}]
+      ]
+      [{Post-hoc,\\global}
+        [{Parametric scaling \cite{platt1999probabilistic,guo2017calibration,kull2019dirichlet,tomani2022pts}}]
+        [{Non-parametric maps \cite{zadrozny2002transforming,naeini2015bbq,zhang2020mixnmatch,gupta2021splines}}]
+      ]
+      [{Post-hoc,\\shift-aware}
+        [{Augmented or OOD inputs \cite{tomani2021posthoc,hekler2023tta,wang2024cascaded,roschewitz2025where}}]
+        [{Multi-domain or reweighted \cite{wang2020transferable,gong2021confidence,yu2022multidomain,zou2023ace}}]
+        [{Feature-density adaptive \cite{sun2022knn,tomani2023dac,yuksekgonul2023atypicality,kim2024energy}}]
+      ]
+      [{Post-hoc,\\group-aware}
+        [{Theory and limits \cite{kleinberg2017inherent,pleiss2017fairness,liu2019implicit}}]
+        [{Within known groups \cite{hebertjohnson2018multicalibration,shen2025calin}}]
+        [{Group-agnostic, via clusters \cite{salvador2022faircal,yang2023beyond}}]
+        [{Worst-group and shift-aware (empty)}, dashed, draw=black!80]
+      ]
+      [{Evaluation}
+        [{Shift benchmarks \cite{hendrycks2019benchmarking,ovadia2019trust,minderer2021revisiting,wald2021calibration,disalvo2024medmnistc,roschewitz2025where}}]
+        [{Fairness audits \cite{seyyedkalantari2021underdiagnosis,zhang2022improving,schrouff2022diagnosing,zong2023medfair,jin2024fairmedfm,ktena2024generative,yang2024limits}}]
+        [{Calibration audits by group \cite{riccilara2023calibration,mehta2023evaluating,dominique2025calibration,xu2026demographic}}]
+        [{Foundation models \cite{khan2023fair,tu2024empirical,hekler2025beyond,huang2026uncertainty,gupta2026subgroup,lin2026crsbench}}]
+        [{Metrics and estimators \cite{brier1950verification,nixon2019measuring,kumar2019verified,roelofs2022mitigating,gruber2022proper}}]
+      ]
+    ]
+  \end{forest}
+  \caption{Taxonomy of methods in the collected papers. I found no published method for the dashed leaf. Backbones and datasets are in Table~\ref{tab:chronology}.}
+  \Description{A tree that grows to the right. The root, calibration under shift and across groups, has five branches. Train-time methods, post-hoc global methods, post-hoc shift-aware methods, post-hoc group-aware methods, and evaluation work. Each branch ends in leaves that name a family of methods with its citations. One leaf under post-hoc group-aware, worst-group and shift-aware, has a dashed border because I found no published method for it.}
+  \label{fig:taxonomy}
+\end{figure}
+
+\section{Taxonomy of Methods}
+\label{sec:taxonomy}
+
+Figure~\ref{fig:taxonomy} sorts the methods by when calibration happens, during training or afterwards on a frozen model, and sorts post-hoc methods by what the calibrator can depend on. A global calibrator uses one mapping for every input, a shift-aware one changes it based on how far an input is from the training data, and a group-aware one changes it based on the patient's group. The last branch holds the benchmarks, audits, and metrics used to test all of these methods.
+
+Train-time methods all require retraining the model. Of these, only Cluster-Focal \cite{shui2023clusterfocal} aims at group calibration, and Mehta et al. \cite{mehta2023evaluating} found that group-robust training can make uncertainty estimates worse. Global post-hoc methods such as temperature scaling (TS) \cite{guo2017calibration} fit a small mapping on clean validation data and become overconfident under shift \cite{tomani2021posthoc}. Shift-aware methods deal with this by showing the calibrator synthetic or out-of-distribution data while fitting it \cite{tomani2021posthoc,roschewitz2025where}, by learning from several source domains \cite{gong2021confidence,yu2022multidomain}, or by making the temperature depend on feature density, as DAC does with nearest-neighbor distances \cite{tomani2023dac}. All of them only target average calibration. On the group-aware side, multicalibration \cite{hebertjohnson2018multicalibration} and CALIN \cite{shen2025calin} calibrate within known groups, and FairCal \cite{salvador2022faircal} avoids needing group labels at test time by calibrating clusters of embeddings. None of them handles a shift between calibration and test data, so the leaf that would combine a worst-group objective with a shift-aware calibrator is empty.
+
+\section{Chronological Overview}
+\label{sec:chronology}
+
+Table~\ref{tab:chronology} splits the papers into three strands that mostly developed separately. From 2017 to 2019, TS became the default calibrator \cite{guo2017calibration}, the limits of group calibration were proved \cite{pleiss2017fairness}, and calibration was shown to break down under dataset shift \cite{ovadia2019trust}. From 2020 to 2022, shift-aware post-hoc calibrators appeared, while fairness work moved to worst-group training \cite{sagawa2020groupdro} and showed that fairness does not always carry over to a new distribution \cite{schrouff2022diagnosing}. In 2023 and 2024, calibrators started to use feature density, calibration bias became its own topic in medical imaging, and benchmarks came out for foundation model fairness and for medical image corruption. Since 2025, work has been more critical of these methods, and Roschewitz et al. \cite{roschewitz2025where} found that calibrators built for shift do not reliably beat simpler ones. The seeds' reference lists show the same split. None of the papers DAC cites deals with patient groups, and none of the papers FairMedFM cites is a calibration method.
+
+\section{Research Gaps}
+\label{sec:gaps}
+
+\textbf{G1. Worst-group calibration under shift.} Every shift-aware calibrator in Figure~\ref{fig:taxonomy} only targets average calibration, and every group-aware one assumes test data look like calibration data \cite{pleiss2017fairness,hebertjohnson2018multicalibration,salvador2022faircal,shen2025calin}. Cluster-Focal \cite{shui2023clusterfocal} targets the worst group, but as a training loss it needs retraining. The cascaded regression of Wang et al. \cite{wang2024cascaded} forms subgroups by predicted class and confidence, not by patient. Atypicality-aware recalibration \cite{yuksekgonul2023atypicality} improved a skin lesion classifier's calibration across skin tones, even for the worst group, without group labels, but it minimizes average loss and was never tested under corruption. This is a problem because fairness in distribution often does not hold out of distribution \cite{schrouff2022diagnosing,yang2024limits}.
+
+\textbf{G2. Group calibration under realistic medical corruption.} MedMNIST-C \cite{disalvo2024medmnistc} provides modality-specific corruptions at five severity levels but only reports accuracy-based metrics and AUC, not calibration. Roschewitz et al. \cite{roschewitz2025where} cover four medical tasks under natural shift, and CRS-Bench \cite{lin2026crsbench} measures how much encoder calibration drops under corruption, but neither reports results by subgroup. FairMedFM reports the ECE gap only on in-distribution test sets. Hekler et al. \cite{hekler2023tta} improved skin cancer calibration at new hospitals without looking at groups, and Dominique et al. \cite{dominique2025calibration} found group calibration problems on new datasets but proposed no fix. As far as I know, no one has measured how fast group calibration drops as corruption gets worse.
+
+\textbf{G3. The adaptation strategy as a factor.} FairMedFM compares adaptation strategies only on clean data, and Gupta et al. \cite{gupta2026subgroup} compare adapter heads on a frozen chest X-ray encoder by subgroup performance, not calibration. Studies of calibration in adapted or foundation models either focus on CLIP and natural images \cite{tu2024empirical,oh2024calibrated,murugesan2024robust} or do not report results by group \cite{roschewitz2025where,hekler2025beyond,huang2026uncertainty,lin2026crsbench}. Since fine-tuning can distort pretrained features \cite{kumar2022finetuning}, it is unclear whether a calibrator fit under one strategy still works under another, and whether the worst-off group changes.
+
+\textbf{G4. How subgroup calibration is evaluated.} Binned ECE is biased when samples are small \cite{kumar2019verified,roelofs2022mitigating}, which can lead to wrong fairness conclusions about small groups \cite{riccilara2023calibration}. Roschewitz et al. also found that better calibration under shift often costs some in-distribution calibration. Even so, FairMedFM sums up calibration fairness with a single ECE gap. A better evaluation would add proper scores such as negative log-likelihood (NLL) and Brier score \cite{brier1950verification,gruber2022proper}, compare against strong simple baselines, and report the in-distribution cost.
+
+\section{Contribution of Each Group Member}
+
+I am the only member of this team, so I am responsible for all of the work in this paper. I chose the topic and wrote the project plan in Phase 0, and the two seed papers come from that plan. For the literature survey I set the scope and the selection criteria, guided the search, ran Connected Papers on both seeds, and reviewed the paper list and the final text. An LLM assistant did much of the mechanical work, as described in Section~\ref{sec:llm}.
+
+\section{Use of Large Language Models}
+\label{sec:llm}
+
+I used Claude Opus 5.5 (Anthropic) through the Claude Code agent. In Phase 0 it helped me set up the ACM LaTeX template, edit the wording of my abstract and my earlier project proposal, and write a script that downloads the reference PDFs. For this survey it pulled the citation lists described in Section 1 from the Semantic Scholar Graph API, screened the titles of the roughly 450 records against my criteria, and used Semantic Scholar metadata and web search to confirm each kept paper's title, venue, and year. It also proposed the taxonomy and the chronological table, drafted and revised the text, and wrote the LaTeX and BibTeX. The agent could not use web apps such as Research Rabbit, Litmaps, Connected Papers, and Inciteful, so I built the Connected Papers graph for each seed myself and exported its paper list. The agent compared the two lists, about 80 papers, with the collected papers. Thirteen were already included, and I added three more after checking them \cite{hekler2023tta,yang2023beyond,tian2024fairdomain}. Each statement about what a paper does or finds was checked against that paper's abstract or full text, not taken from the model's memory. The full list of collected papers, with how each one links to the seeds and its Semantic Scholar citation count where available, is in \texttt{literature\_list.csv} in the project files. I am responsible for the final content.
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{references}
+
+\end{document}

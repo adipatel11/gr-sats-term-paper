@@ -1,0 +1,100 @@
+
+Skip To Content
+Dashboard
+Adit Patel
+Account
+Dashboard
+Courses
+Mental Health
+Groups
+Calendar
+Inbox
+History
+Studio
+10
+Help
+-XL-sk2135-1259833
+Pages
+Term Paper / Course Project De…
+
+
+Fall 2026
+Home
+Modules
+People
+Syllabus
+Grades6
+Bulldog Bundle Digital Materials
+Cisco Webex
+Discussions
+Announcements
+Assignments
+Pages
+Quizzes
+TurningPoint
+Notebook
+  Alternative formats
+Term Paper / Course Project Description – Fall 2026
+Project Objective
+The Term Paper / Course Project is a major research-oriented component of CSE 8673 and accounts for 40% of the final course grade. The objective is to provide students with hands-on experience in conducting a structured machine-learning study, from identifying a problem and reviewing the literature to implementing and evaluating machine-learning methods and communicating the resulting technical findings. Students are expected to go beyond simply running an existing implementation and demonstrate an understanding of why a particular ML approach is appropriate, how it should be evaluated, and what can be learned from the experimental results.
+
+Students may work individually or in teams of up to three students, unless otherwise approved by the instructor. Each project should investigate a well-defined problem related to machine learning or its application to a relevant domain. Suitable projects may involve supervised learning, unsupervised learning, regression, classification, dimensionality reduction, clustering, support vector machines, neural networks, optimization, or other modern ML methods relevant to the course. The selected topic may extend beyond material explicitly covered in lectures when appropriate.
+
+Choosing a Project Topic
+Students may select a project from one of the following general categories:
+
+1. Application-Oriented Project
+Apply machine-learning methods to a meaningful real-world problem and systematically evaluate their performance.
+
+2. Comparative/Experimental Project
+Compare multiple ML algorithms, preprocessing approaches, feature representations, regularization strategies, or other methodological choices under a well-defined experimental setting.
+
+3. Research-Oriented Project
+Investigate a research question motivated by recent literature. Students may reproduce an existing method as a baseline, but the project should include an additional comparison, modification, experiment, application, dataset, or technical analysis.
+
+Suggested Topic Areas
+Students are encouraged to select a topic that matches their interests and available data. Possible areas include:
+
+Computer Vision: image classification, object recognition, medical imaging
+Natural Language Processing: text classification, sentiment analysis, document analysis
+Cybersecurity: intrusion detection, anomaly detection, malicious traffic classification
+Healthcare and Biomedical ML: disease prediction, physiological data analysis
+Wireless Communications and Networking: spectrum sensing, channel prediction, traffic prediction, RF classification, localization
+Transportation and Smart Systems: traffic prediction, mobility analysis, autonomous systems
+Time-Series and Sensor Data: forecasting, activity recognition, IoT analytics
+Scientific and Engineering ML: ML for engineering systems, optimization, simulation, and sensing
+General ML: regression, classification, clustering, dimensionality reduction, feature selection, model comparison
+Other ML Topics: other appropriate topics may be proposed with instructor approval.
+A very good project will be a publishable or nearly publishable piece of work. Most of the students continue working on their projects after completing this course, submitting their work to conferences or journals. Thus, for inspiration, you might also look at some recent machine learning research papers. Two of the main machine learning conferences are ICML and NeurIPS. You can find papers from the recent ICML https://icml.cc/Conferences/2026/ScheduleLinks to an external site. and NeurIPS conference https://neurips.cc/Conferences/2026/Schedule. Links to an external site.
+
+Once you have identified a topic of interest, it can be useful to look up existing research on relevant topics by searching related keywords on an academic search engine such as: http://scholar.google.comLinks to an external site.. Another important aspect of designing your project is to identify one or several datasets suitable for your topic of interest. If that data needs considerable pre-processing  to suit your task, or if you intend to collect the needed data yourself, keep in mind that this is only one part of the expected project work, but can often take considerable time. We still expect a solid methodology and discussion of results, so pace your project accordingly.
+
+Expected Research Process
+Each project should follow a structured research workflow:
+
+Problem → Literature → Research Question → Data → Methodology → Baseline → Experiments → Evaluation → Analysis → Conclusions
+
+Students should clearly define the ML problem and its motivation, review relevant scholarly literature, formulate a specific research question or objective, identify an appropriate dataset, and select a suitable machine-learning methodology. Experimental studies should include appropriate baseline method(s) and quantitative performance metrics. Students are expected not only to report numerical results but also to interpret and critically analyze the observed performance, discuss limitations, and explain what conclusions can reasonably be drawn from the study.
+
+A project that only executes an existing GitHub/Kaggle notebook, trains a single model, or reports accuracy without meaningful comparison and analysis will not constitute a complete research-oriented project. Technical complexity alone does not determine project quality. A relatively simple ML method accompanied by rigorous experimentation, meaningful comparisons, reproducibility, and insightful analysis may constitute a strong project.
+
+Project Phases and Schedule
+The project will be developed progressively throughout the semester. The major milestones established in the course schedule are:
+
+Phase 0: Topic/Team Formation: For Phase 0, students should initially identify two preferred technical directions. The selected area represents a broad research direction rather than a fixed project task; the specific problem, dataset, research question, and methodology will be refined subsequently.
+Phase 1: Literature Survey: Starting from relevant seed/example papers and scholarly databases, systematically investigate related literature. Develop a taxonomy of existing methodologies, prepare a chronological overview, summarize important related work in a comparative table, and provide a one-page synthesis identifying major approaches, findings, and limitations.
+Phase 2: Research Proposal: Define the target problem and justify its importance and difficulty through the Phase 1 literature analysis. Identify the top three technical challenges, formulate the research question/objective, propose techniques to address the identified challenges, and specify the dataset, baseline(s), experimental plan, evaluation metrics, implementation schedule, and expected contributions.
+Phase 3: Method Design and Project Presentation: Present the developed methodology and experimental study. The project should include a detailed description of the proposed/selected approach, an illustrative methodology/model figure where appropriate, comparison with meaningful baselines, effectiveness and/or efficiency evaluation, preliminary or completed experimental results, and optional ablation analysis where relevant.
+Phase 4: Final Report and Presentations: Submit and present the completed project.
+During Phases 0–3, students may receive both a completion assessment and a projected quality assessment. The projected assessment indicates the expected quality of the corresponding component if it remains unchanged in the final submission. Students may use instructor feedback from each phase to revise and improve their work before Phase 4. The final project grade will reflect the quality of the completed project and final submission.
+
+Final Deliverables: (8-page paper + Source code + Poster presentation)
+Example report and poster: https://cs229.stanford.edu/proj2020spr/Links to an external site.
+
+The primary deliverable is a research paper with at least 8 pages of main-body content, excluding references and appendices, formatted using the IEEE two-column conference template. The paper should normally contain Abstract, Introduction, Related Work, Problem/Data Description, Methodology, Experimental Setup, Results and Discussion, Limitations, Conclusion, and References. Students should provide sufficient information regarding datasets, preprocessing, model configuration, experimental settings, baselines, and evaluation metrics to make the work understandable and reproducible.
+
+Source Code: Students must submit runnable source code sufficient to reproduce the reported experimental results, together with any necessary instructions, dependencies, and dataset-access information. Python is assumed unless another programming environment is justified by the project.
+
+For team projects, the final submission should clearly identify the contribution of each team member. Students remain responsible for the originality, correctness, citations, code, experimental analysis, and conclusions of their submissions. Generative AI tools may be used according to the course AI policy, but their use must be appropriately acknowledged as specified in the syllabus.
+
+The central expectation is not simply to obtain the highest model accuracy but to conduct a technically sound ML investigation and communicate what was learned from it.

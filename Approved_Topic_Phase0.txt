@@ -1,0 +1,51 @@
+Proposed project
+
+Title, target venue, year:
+
+Worst-Group Calibration of Adapted Medical Foundation Models Under Image Corruption. If the results are good, I'd like to aim for the MICCAI 2027 FAIMI or UNSURE workshop.
+
+Research problem:
+
+Based on your feedback, I dropped the resolution and kNN parts and narrowed it down to one question. If a foundation model is adapted to a medical task and then calibrated on clean validation data, does that calibration still hold up when the test images are corrupted? And does it get worse for some patient groups more than others? If it does, I want to try a simple fix.
+
+Datasets:
+
+I'm planning to start with two dermatology datasets. HAM10000 has sex and age, and Fitzpatrick17k has skin type, which I'd group into I-II, III-IV, and V-VI. For both, the task is predicting whether a lesion is malignant. For the corruptions I'll use MedMNIST-C, which adds things like noise, blur, and brightness changes at five severity levels. If there's time I'd add CheXpert later. All of these are public.
+
+Methodology:
+
+I'll use a few ViT backbones with different pretraining (ImageNet, DINOv2, and BiomedCLIP) and adapt each one with linear probing, LoRA, and full fine-tuning, using the FairMedFM code where I can.
+
+For the fix, I found a method called DAC (ICML 2023) that gives each test image its own temperature based on how far it is from the training data in feature space. Right now it's fit so the model is calibrated on average. My idea is to fit it so the worst group is calibrated instead, kind of like how GroupDRO trains for the worst group. It only needs group labels while fitting, and the model doesn't need to be retrained. To see if it generalizes, I'd fit it on some corruption types and test on the rest.
+
+I'll compare it against no calibration, regular temperature scaling, and the original DAC. I'll measure ECE, Brier score, and NLL for each group at each severity level, and also track how AUC drops.
+
+Main contribution and expected results:
+
+The main contribution would be a worst-group version of shift-aware calibration. I'm hoping it lowers calibration error for the worst group on corrupted images without hurting clean performance much. Even if it doesn't beat the baselines, the study should still show when clean calibration stops working for each adaptation method and whether some groups are hit harder.
+
+Limitations/gap:
+
+Ovadia et al. (NeurIPS 2019) showed that calibration gets worse as images get more corrupted, and methods like DAC try to fix that, but only for average calibration. FairMedFM and MEDFAIR report calibration across groups, but only on clean images. So far I haven't found anything that looks at corruption, group calibration, and adaptation method together, though I still need to do a more thorough search.
+
+One limitation of my idea is that the calibrator doesn't see group labels at test time, so it can only help the worst group if that group's images look different in feature space. It's possible it won't work, which is why I want to start with a small trail.
+
+How I would carry it out:
+
+Until mid-October I'd run a small trial with DINOv2 and BiomedCLIP to check whether calibration actually breaks under corruption and whether it breaks unevenly across groups. If it does, I'd run the full experiments from late October to mid-November and use late November for analysis and writing. The calibration methods run on saved model outputs, so most of the compute goes to fine-tuning. The code for FairMedFM, DAC, and MedMNIST-C is all on GitHub.
+
+Links:
+
+HAM10000: https://doi.org/10.7910/DVN/DBW86T
+
+Fitzpatrick17k: https://github.com/mattgroh/fitzpatrick17k
+
+CheXpert: https://stanfordmlgroup.github.io/competitions/chexpert/
+
+MedMNIST-C: https://github.com/francescodisalvo05/medmnistc-api
+
+DAC: https://github.com/futakw/DensityAwareCalibration
+
+FairMedFM: https://github.com/FairMedFM/FairMedFM
+
+MEDFAIR: https://github.com/ys-zong/MEDFAIR

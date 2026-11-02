@@ -1,0 +1,726 @@
+% References for "Group-Robust Shift-Aware Temperature Scaling for Adapted
+% Medical Foundation Models Under Image Corruption" (CSE 8673, Fall 2026).
+% Phase 1 literature survey list, merged with the Phase 0 list.
+% Venues, years, and author lists were checked against Semantic Scholar,
+% the publisher or proceedings page, or arXiv on 3 October 2026.
+% Page numbers are only given where they were confirmed.
+
+% ---------------------------------------------------------------------------
+% Seed papers
+% ---------------------------------------------------------------------------
+
+@inproceedings{tomani2023dac,
+  author    = {Tomani, Christian and Waseda, Futa Kai and Shen, Yuesong and Cremers, Daniel},
+  title     = {Beyond In-Domain Scenarios: Robust Density-Aware Calibration},
+  booktitle = {Proceedings of the 40th International Conference on Machine Learning (ICML)},
+  series    = {PMLR},
+  volume    = {202},
+  pages     = {34344--34368},
+  year      = {2023},
+  url       = {https://proceedings.mlr.press/v202/tomani23a.html}
+}
+
+@inproceedings{jin2024fairmedfm,
+  author    = {Jin, Ruinan and Xu, Zikang and Zhong, Yuan and Yao, Qingsong and Dou, Qi and Zhou, S. Kevin and Li, Xiaoxiao},
+  title     = {{FairMedFM}: Fairness Benchmarking for Medical Imaging Foundation Models},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS), Datasets and Benchmarks Track},
+  volume    = {37},
+  year      = {2024},
+  url       = {https://arxiv.org/abs/2407.00983}
+}
+
+% ---------------------------------------------------------------------------
+% Post-hoc calibration, global
+% ---------------------------------------------------------------------------
+
+@incollection{platt1999probabilistic,
+  author    = {Platt, John C.},
+  title     = {Probabilistic Outputs for Support Vector Machines and Comparisons to Regularized Likelihood Methods},
+  booktitle = {Advances in Large Margin Classifiers},
+  publisher = {MIT Press},
+  pages     = {61--74},
+  year      = {1999}
+}
+
+@inproceedings{zadrozny2002transforming,
+  author    = {Zadrozny, Bianca and Elkan, Charles},
+  title     = {Transforming Classifier Scores into Accurate Multiclass Probability Estimates},
+  booktitle = {Proceedings of the ACM SIGKDD International Conference on Knowledge Discovery and Data Mining (KDD)},
+  pages     = {694--699},
+  year      = {2002}
+}
+
+@inproceedings{naeini2015bbq,
+  author    = {Naeini, Mahdi Pakdaman and Cooper, Gregory F. and Hauskrecht, Milos},
+  title     = {Obtaining Well Calibrated Probabilities Using {Bayesian} Binning},
+  booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence},
+  year      = {2015}
+}
+
+@inproceedings{guo2017calibration,
+  author    = {Guo, Chuan and Pleiss, Geoff and Sun, Yu and Weinberger, Kilian Q.},
+  title     = {On Calibration of Modern Neural Networks},
+  booktitle = {Proceedings of the 34th International Conference on Machine Learning (ICML)},
+  series    = {PMLR},
+  volume    = {70},
+  year      = {2017}
+}
+
+@inproceedings{kull2019dirichlet,
+  author    = {Kull, Meelis and Perello-Nieto, Miquel and K{\"a}ngsepp, Markus and Silva Filho, Telmo and Song, Hao and Flach, Peter},
+  title     = {Beyond Temperature Scaling: Obtaining Well-Calibrated Multiclass Probabilities with {Dirichlet} Calibration},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {32},
+  year      = {2019}
+}
+
+@inproceedings{zhang2020mixnmatch,
+  author    = {Zhang, Jize and Kailkhura, Bhavya and Han, T. Yong-Jin},
+  title     = {Mix-n-Match: Ensemble and Compositional Methods for Uncertainty Calibration in Deep Learning},
+  booktitle = {Proceedings of the 37th International Conference on Machine Learning (ICML)},
+  series    = {PMLR},
+  volume    = {119},
+  year      = {2020}
+}
+
+@inproceedings{gupta2021splines,
+  author    = {Gupta, Kartik and Rahimi, Amir and Ajanthan, Thalaiyasingam and Mensink, Thomas and Sminchisescu, Cristian and Hartley, Richard},
+  title     = {Calibration of Neural Networks using Splines},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2021}
+}
+
+@inproceedings{tomani2022pts,
+  author    = {Tomani, Christian and Cremers, Daniel and Buettner, Florian},
+  title     = {Parameterized Temperature Scaling for Boosting the Expressive Power in Post-Hoc Uncertainty Calibration},
+  booktitle = {European Conference on Computer Vision (ECCV)},
+  publisher = {Springer},
+  year      = {2022}
+}
+
+% ---------------------------------------------------------------------------
+% Train-time calibration and robust fine-tuning
+% ---------------------------------------------------------------------------
+
+@inproceedings{gal2016dropout,
+  author    = {Gal, Yarin and Ghahramani, Zoubin},
+  title     = {Dropout as a {Bayesian} Approximation: Representing Model Uncertainty in Deep Learning},
+  booktitle = {Proceedings of the 33rd International Conference on Machine Learning (ICML)},
+  series    = {PMLR},
+  volume    = {48},
+  year      = {2016}
+}
+
+@inproceedings{lakshminarayanan2017ensembles,
+  author    = {Lakshminarayanan, Balaji and Pritzel, Alexander and Blundell, Charles},
+  title     = {Simple and Scalable Predictive Uncertainty Estimation using Deep Ensembles},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {30},
+  year      = {2017}
+}
+
+@inproceedings{muller2019labelsmoothing,
+  author    = {M{\"u}ller, Rafael and Kornblith, Simon and Hinton, Geoffrey E.},
+  title     = {When Does Label Smoothing Help?},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {32},
+  year      = {2019}
+}
+
+@inproceedings{thulasidasan2019mixup,
+  author    = {Thulasidasan, Sunil and Chennupati, Gopinath and Bilmes, Jeff A. and Bhattacharya, Tanmoy and Michalak, Sarah},
+  title     = {On Mixup Training: Improved Calibration and Predictive Uncertainty for Deep Neural Networks},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {32},
+  year      = {2019}
+}
+
+@inproceedings{mukhoti2020focal,
+  author    = {Mukhoti, Jishnu and Kulharia, Viveka and Sanyal, Amartya and Golodetz, Stuart and Torr, Philip H. S. and Dokania, Puneet K.},
+  title     = {Calibrating Deep Neural Networks using Focal Loss},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {33},
+  year      = {2020}
+}
+
+@inproceedings{liu2022margin,
+  author    = {Liu, Bingyuan and Ben Ayed, Ismail and Galdran, Adrian and Dolz, Jose},
+  title     = {The Devil is in the Margin: Margin-based Label Smoothing for Network Calibration},
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+  year      = {2022}
+}
+
+@inproceedings{kumar2022finetuning,
+  author    = {Kumar, Ananya and Raghunathan, Aditi and Jones, Robbie and Ma, Tengyu and Liang, Percy},
+  title     = {Fine-Tuning can Distort Pretrained Features and Underperform Out-of-Distribution},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2022}
+}
+
+@inproceedings{oh2024calibrated,
+  author    = {Oh, Changdae and Lim, Hyesu and Kim, Mijoo and Han, Dongyoon and Yun, Sangdoo and Choo, Jaegul and Hauptmann, Alexander and Cheng, Zhi-Qi and Song, Kyungwoo},
+  title     = {Towards Calibrated Robust Fine-Tuning of Vision-Language Models},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {37},
+  year      = {2024}
+}
+
+@inproceedings{murugesan2024robust,
+  author    = {Murugesan, Balamurali and Silva-Rodr{\'i}guez, Julio and Ben Ayed, Ismail and Dolz, Jose},
+  title     = {Robust Calibration of Large Vision-Language Adapters},
+  booktitle = {European Conference on Computer Vision (ECCV)},
+  publisher = {Springer},
+  year      = {2024}
+}
+
+% ---------------------------------------------------------------------------
+% Post-hoc calibration under distribution shift
+% ---------------------------------------------------------------------------
+
+@inproceedings{wang2020transferable,
+  author    = {Wang, Ximei and Long, Mingsheng and Wang, Jianmin and Jordan, Michael I.},
+  title     = {Transferable Calibration with Lower Bias and Variance in Domain Adaptation},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {33},
+  year      = {2020}
+}
+
+@inproceedings{tomani2021posthoc,
+  author    = {Tomani, Christian and Gruber, Sebastian and Erdem, Muhammed Ebrar and Cremers, Daniel and Buettner, Florian},
+  title     = {Post-hoc Uncertainty Calibration for Domain Drift Scenarios},
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+  year      = {2021}
+}
+
+@inproceedings{gong2021confidence,
+  author    = {Gong, Yunye and Lin, Xiao and Yao, Yi and Dietterich, Thomas G. and Divakaran, Ajay and Gervasio, Melinda},
+  title     = {Confidence Calibration for Domain Generalization under Covariate Shift},
+  booktitle = {Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV)},
+  pages     = {8958--8967},
+  year      = {2021}
+}
+
+@inproceedings{wald2021calibration,
+  author    = {Wald, Yoav and Feder, Amir and Greenfeld, Daniel and Shalit, Uri},
+  title     = {On Calibration and Out-of-Domain Generalization},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {34},
+  year      = {2021}
+}
+
+@inproceedings{yu2022multidomain,
+  author    = {Yu, Yaodong and Bates, Stephen and Ma, Yi and Jordan, Michael I.},
+  title     = {Robust Calibration with Multi-domain Temperature Scaling},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {35},
+  year      = {2022}
+}
+
+@inproceedings{sun2022knn,
+  author    = {Sun, Yiyou and Ming, Yifei and Zhu, Xiaojin and Li, Yixuan},
+  title     = {Out-of-Distribution Detection with Deep Nearest Neighbors},
+  booktitle = {Proceedings of the 39th International Conference on Machine Learning (ICML)},
+  series    = {PMLR},
+  volume    = {162},
+  year      = {2022}
+}
+
+@inproceedings{zou2023ace,
+  author    = {Zou, Yuli and Deng, Weijian and Zheng, Liang},
+  title     = {Adaptive Calibrator Ensemble: Navigating Test Set Difficulty in Out-of-Distribution Scenarios},
+  booktitle = {Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV)},
+  pages     = {19333--19342},
+  year      = {2023}
+}
+
+@inproceedings{hekler2023tta,
+  author    = {Hekler, Achim and Brinker, Titus J. and Buettner, Florian},
+  title     = {Test Time Augmentation Meets Post-hoc Calibration: Uncertainty Quantification under Real-World Conditions},
+  booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence},
+  volume    = {37},
+  number    = {12},
+  pages     = {14856--14864},
+  year      = {2023},
+  doi       = {10.1609/aaai.v37i12.26735}
+}
+
+@inproceedings{yuksekgonul2023atypicality,
+  author    = {Yuksekgonul, Mert and Zhang, Linjun and Zou, James and Guestrin, Carlos},
+  title     = {Beyond Confidence: Reliable Models Should Also Consider Atypicality},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {36},
+  year      = {2023}
+}
+
+@inproceedings{wang2024cascaded,
+  author    = {Wang, Jiexin and Chen, Jiahao and Su, Bing},
+  title     = {Domain-Adaptive and Subgroup-Specific Cascaded Temperature Regression for Out-of-Distribution Calibration},
+  booktitle = {IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)},
+  year      = {2024}
+}
+
+@inproceedings{kim2024energy,
+  author    = {Kim, Mijoo and Kwon, Junseok},
+  title     = {Uncertainty Calibration with Energy Based Instance-wise Scaling in the Wild Dataset},
+  booktitle = {European Conference on Computer Vision (ECCV)},
+  series    = {LNCS},
+  volume    = {15104},
+  pages     = {232--248},
+  publisher = {Springer},
+  year      = {2024}
+}
+
+@article{roschewitz2025where,
+  author    = {Roschewitz, M{\'e}lanie and Mehta, Raghav and De Sousa Ribeiro, Fabio and Glocker, Ben},
+  title     = {Where are we with calibration under dataset shift in image classification?},
+  journal   = {Transactions on Machine Learning Research},
+  year      = {2025},
+  url       = {https://arxiv.org/abs/2507.07780}
+}
+
+% ---------------------------------------------------------------------------
+% Fairness, group calibration, and group robustness
+% ---------------------------------------------------------------------------
+
+@inproceedings{kleinberg2017inherent,
+  author    = {Kleinberg, Jon and Mullainathan, Sendhil and Raghavan, Manish},
+  title     = {Inherent Trade-Offs in the Fair Determination of Risk Scores},
+  booktitle = {Innovations in Theoretical Computer Science Conference (ITCS)},
+  year      = {2017}
+}
+
+@inproceedings{pleiss2017fairness,
+  author    = {Pleiss, Geoff and Raghavan, Manish and Wu, Felix and Kleinberg, Jon and Weinberger, Kilian Q.},
+  title     = {On Fairness and Calibration},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {30},
+  year      = {2017}
+}
+
+@inproceedings{hebertjohnson2018multicalibration,
+  author    = {H{\'e}bert-Johnson, Ursula and Kim, Michael P. and Reingold, Omer and Rothblum, Guy N.},
+  title     = {Multicalibration: Calibration for the (Computationally-Identifiable) Masses},
+  booktitle = {Proceedings of the 35th International Conference on Machine Learning (ICML)},
+  series    = {PMLR},
+  volume    = {80},
+  year      = {2018}
+}
+
+@inproceedings{liu2019implicit,
+  author    = {Liu, Lydia T. and Simchowitz, Max and Hardt, Moritz},
+  title     = {The Implicit Fairness Criterion of Unconstrained Learning},
+  booktitle = {Proceedings of the 36th International Conference on Machine Learning (ICML)},
+  series    = {PMLR},
+  volume    = {97},
+  pages     = {4051--4060},
+  year      = {2019}
+}
+
+@inproceedings{sagawa2020groupdro,
+  author    = {Sagawa, Shiori and Koh, Pang Wei and Hashimoto, Tatsunori B. and Liang, Percy},
+  title     = {Distributionally Robust Neural Networks for Group Shifts: On the Importance of Regularization for Worst-Case Generalization},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2020}
+}
+
+@inproceedings{idrissi2022simple,
+  author    = {Idrissi, Badr Youbi and Arjovsky, Martin and Pezeshki, Mohammad and Lopez-Paz, David},
+  title     = {Simple Data Balancing Achieves Competitive Worst-Group-Accuracy},
+  booktitle = {Conference on Causal Learning and Reasoning (CLeaR)},
+  series    = {PMLR},
+  volume    = {177},
+  year      = {2022}
+}
+
+@inproceedings{salvador2022faircal,
+  author    = {Salvador, Tiago and Cairns, Stephanie and Voleti, Vikram and Marshall, Noah and Oberman, Adam},
+  title     = {{FairCal}: Fairness Calibration for Face Verification},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2022}
+}
+
+@inproceedings{yang2023beyond,
+  author    = {Yang, Jia-Qi and Zhan, De-Chuan and Gan, Le},
+  title     = {Beyond Probability Partitions: Calibrating Neural Networks with Semantic Aware Grouping},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {36},
+  year      = {2023}
+}
+
+@inproceedings{shui2023clusterfocal,
+  author    = {Shui, Changjian and Szeto, Justin and Mehta, Raghav and Arnold, Douglas L. and Arbel, Tal},
+  title     = {Mitigating Calibration Bias Without Fixed Attribute Grouping for Improved Fairness in Medical Imaging Analysis},
+  booktitle = {Medical Image Computing and Computer Assisted Intervention (MICCAI)},
+  pages     = {189--198},
+  publisher = {Springer},
+  year      = {2023},
+  doi       = {10.1007/978-3-031-43898-1_19}
+}
+
+@inproceedings{dutt2024fairtune,
+  author    = {Dutt, Raman and Bohdal, Ondrej and Tsaftaris, Sotirios A. and Hospedales, Timothy},
+  title     = {{FairTune}: Optimizing Parameter Efficient Fine Tuning for Fairness in Medical Image Analysis},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2024}
+}
+
+@inproceedings{shen2025calin,
+  author    = {Shen, Xing and Szeto, Justin and Li, Mingyang and Huang, Hengguan and Arbel, Tal},
+  title     = {Exposing and Mitigating Calibration Biases and Demographic Unfairness in {MLLM} Few-Shot In-Context Learning for Medical Image Classification},
+  booktitle = {Medical Image Computing and Computer Assisted Intervention (MICCAI)},
+  publisher = {Springer},
+  year      = {2025},
+  url       = {https://arxiv.org/abs/2506.23298}
+}
+
+% ---------------------------------------------------------------------------
+% Fairness and calibration audits in medical imaging
+% ---------------------------------------------------------------------------
+
+@article{seyyedkalantari2021underdiagnosis,
+  author    = {Seyyed-Kalantari, Laleh and Zhang, Haoran and McDermott, Matthew B. A. and Chen, Irene Y. and Ghassemi, Marzyeh},
+  title     = {Underdiagnosis Bias of Artificial Intelligence Algorithms Applied to Chest Radiographs in Under-Served Patient Populations},
+  journal   = {Nature Medicine},
+  volume    = {27},
+  year      = {2021}
+}
+
+@inproceedings{zhang2022improving,
+  author    = {Zhang, Haoran and Dullerud, Natalie and Roth, Karsten and Oakden-Rayner, Lauren and Pfohl, Stephen and Ghassemi, Marzyeh},
+  title     = {Improving the Fairness of Chest X-ray Classifiers},
+  booktitle = {Conference on Health, Inference, and Learning (CHIL)},
+  series    = {PMLR},
+  volume    = {174},
+  year      = {2022}
+}
+
+@inproceedings{schrouff2022diagnosing,
+  author    = {Schrouff, Jessica and Harris, Natalie and Koyejo, Oluwasanmi and Alabdulmohsin, Ibrahim and Schnider, Eva and Opsahl-Ong, Krista and Brown, Alex and Roy, Subhrajit and Mincu, Diana and Chen, Christina and others},
+  title     = {Diagnosing Failures of Fairness Transfer Across Distribution Shift in Real-World Medical Settings},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {35},
+  year      = {2022}
+}
+
+@inproceedings{zong2023medfair,
+  author    = {Zong, Yongshuo and Yang, Yongxin and Hospedales, Timothy},
+  title     = {{MEDFAIR}: Benchmarking Fairness for Medical Imaging},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2023}
+}
+
+@inproceedings{riccilara2023calibration,
+  author    = {Ricci Lara, Mar{\'i}a Agustina and Mosquera, Candelaria and Ferrante, Enzo and Echeveste, Rodrigo},
+  title     = {Towards Unraveling Calibration Biases in Medical Image Analysis},
+  booktitle = {Clinical Image-Based Procedures, Fairness of AI in Medical Imaging, and Ethical and Philosophical Issues in Medical Imaging (CLIP, FAIMI, EPIMI)},
+  series    = {LNCS},
+  volume    = {14242},
+  pages     = {132--141},
+  publisher = {Springer},
+  year      = {2023},
+  doi       = {10.1007/978-3-031-45249-9_13}
+}
+
+@inproceedings{mehta2023evaluating,
+  author    = {Mehta, Raghav and Shui, Changjian and Arbel, Tal},
+  title     = {Evaluating the Fairness of Deep Learning Uncertainty Estimates in Medical Image Analysis},
+  booktitle = {Medical Imaging with Deep Learning (MIDL)},
+  series    = {PMLR},
+  volume    = {227},
+  year      = {2023}
+}
+
+@article{ktena2024generative,
+  author    = {Ktena, Ira and Wiles, Olivia and Albuquerque, Isabela and Rebuffi, Sylvestre-Alvise and others},
+  title     = {Generative Models Improve Fairness of Medical Classifiers under Distribution Shifts},
+  journal   = {Nature Medicine},
+  volume    = {30},
+  pages     = {1166--1173},
+  year      = {2024}
+}
+
+@inproceedings{tian2024fairdomain,
+  author    = {Tian, Yu and Wen, Congcong and Shi, Min and Afzal, Muhammad Muneeb and Huang, Hao and Khan, Muhammad Osama and Luo, Yan and Fang, Yi and Wang, Mengyu},
+  title     = {{FairDomain}: Achieving Fairness in Cross-Domain Medical Image Segmentation and Classification},
+  booktitle = {European Conference on Computer Vision (ECCV)},
+  publisher = {Springer},
+  year      = {2024}
+}
+
+@article{yang2024limits,
+  author    = {Yang, Yuzhe and Zhang, Haoran and Gichoya, Judy W. and Katabi, Dina and Ghassemi, Marzyeh},
+  title     = {The Limits of Fair Medical Imaging {AI} in Real-World Generalization},
+  journal   = {Nature Medicine},
+  volume    = {30},
+  number    = {10},
+  pages     = {2838--2848},
+  year      = {2024}
+}
+
+@article{dominique2025calibration,
+  author    = {Dominique, Brandon and Lam, Prudence and Kurtansky, Nicholas and Weber, Jochen and Kose, Kivanc and Rotemberg, Veronica and Dy, Jennifer},
+  title     = {On the Role of Calibration in Benchmarking Algorithmic Fairness for Skin Cancer Detection},
+  journal   = {Machine Learning for Biomedical Imaging (Special Issue on FAIMI)},
+  pages     = {618--636},
+  year      = {2025},
+  doi       = {10.59275/j.melba.2025-ae66}
+}
+
+@inproceedings{xu2026demographic,
+  author    = {Xu, Sonnet and Daneshjou, Roxana},
+  title     = {Demographic Calibration of Vision-Language Models for Dermatology},
+  booktitle = {AISTATS Workshop on Towards Trustworthy Predictions: Theory and Applications of Calibration for Modern AI},
+  year      = {2026},
+  url       = {https://openreview.net/forum?id=AnrhY1hrlH}
+}
+
+@misc{gupta2026subgroup,
+  author       = {Gupta, Dhruv and Stanley, Emma A. M. and De Sousa Ribeiro, Fabio and Desai, Sujal R. and Glocker, Ben},
+  title        = {Subgroup Performance Analysis of Adaptation Strategies for Chest X-ray Foundation Models},
+  howpublished = {arXiv preprint arXiv:2608.19078, accepted at the MICCAI FAIMI Workshop 2026},
+  year         = {2026}
+}
+
+% ---------------------------------------------------------------------------
+% Benchmarks for shift and corruption, and studies of foundation model calibration
+% ---------------------------------------------------------------------------
+
+@inproceedings{hendrycks2019benchmarking,
+  author    = {Hendrycks, Dan and Dietterich, Thomas},
+  title     = {Benchmarking Neural Network Robustness to Common Corruptions and Perturbations},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2019}
+}
+
+@inproceedings{ovadia2019trust,
+  author    = {Ovadia, Yaniv and Fertig, Emily and Ren, Jie and Nado, Zachary and Sculley, D. and Nowozin, Sebastian and Dillon, Joshua V. and Lakshminarayanan, Balaji and Snoek, Jasper},
+  title     = {Can You Trust Your Model's Uncertainty? {Evaluating} Predictive Uncertainty Under Dataset Shift},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {32},
+  year      = {2019}
+}
+
+@inproceedings{minderer2021revisiting,
+  author    = {Minderer, Matthias and Djolonga, Josip and Romijnders, Rob and Hubis, Frances and Zhai, Xiaohua and Houlsby, Neil and Tran, Dustin and Lucic, Mario},
+  title     = {Revisiting the Calibration of Modern Neural Networks},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {34},
+  year      = {2021}
+}
+
+@inproceedings{disalvo2024medmnistc,
+  author    = {Di Salvo, Francesco and Doerrich, Sebastian and Ledig, Christian},
+  title     = {{MedMNIST-C}: Comprehensive Benchmark and Improved Classifier Robustness by Simulating Realistic Image Corruptions},
+  booktitle = {MICCAI Workshop on Advancing Data Solutions in Medical Imaging AI (ADSMI)},
+  year      = {2024},
+  url       = {https://arxiv.org/abs/2406.17536}
+}
+
+@inproceedings{tu2024empirical,
+  author    = {Tu, Weijie and Deng, Weijian and Campbell, Dylan and Gould, Stephen and Gedeon, Tom},
+  title     = {An Empirical Study Into What Matters for Calibrating Vision-Language Models},
+  booktitle = {Proceedings of the 41st International Conference on Machine Learning (ICML)},
+  series    = {PMLR},
+  volume    = {235},
+  pages     = {48791--48808},
+  year      = {2024}
+}
+
+@misc{hekler2025beyond,
+  author       = {Hekler, Achim and Kuhn, Lukas and Buettner, Florian},
+  title        = {Beyond Overconfidence: Foundation Models Redefine Calibration in Deep Neural Networks},
+  howpublished = {arXiv preprint arXiv:2506.09593},
+  year         = {2025}
+}
+
+@misc{lin2026crsbench,
+  author       = {Lin, Xingtao and Ren, Hangqi and Sun, Caiwan and Chen, You},
+  title        = {{CRS-Bench}: A Reference-Relative Reliability Benchmark for Medical Image Encoders},
+  howpublished = {arXiv preprint arXiv:2608.22059},
+  year         = {2026}
+}
+
+@inproceedings{khan2023fair,
+  author    = {Khan, Muhammad Osama and Afzal, Muhammad Muneeb and Mirza, Shujaat and Fang, Yi},
+  title     = {How Fair are Medical Imaging Foundation Models?},
+  booktitle = {Proceedings of the 3rd Machine Learning for Health Symposium (ML4H)},
+  series    = {PMLR},
+  volume    = {225},
+  pages     = {217--231},
+  year      = {2023}
+}
+
+@misc{wang2023survey,
+  author       = {Wang, Cheng},
+  title        = {Calibration in Deep Learning: A Survey of the State-of-the-Art},
+  howpublished = {arXiv preprint arXiv:2308.01222},
+  year         = {2023}
+}
+
+@misc{shi2024survey,
+  author       = {Shi, Congzhen and Rezai, Ryan and Yang, Jiaxi and Dou, Qi and Li, Xiaoxiao},
+  title        = {A Survey on Trustworthiness in Foundation Models for Medical Image Analysis},
+  howpublished = {arXiv preprint arXiv:2407.15851},
+  year         = {2024}
+}
+
+@misc{huang2026uncertainty,
+  author       = {Huang, Haoxu and Razavian, Narges},
+  title        = {Uncertainty of Vision Medical Foundation Models},
+  howpublished = {arXiv preprint arXiv:2608.30390},
+  year         = {2026}
+}
+
+% ---------------------------------------------------------------------------
+% Calibration metrics and estimators
+% ---------------------------------------------------------------------------
+
+@article{brier1950verification,
+  author    = {Brier, Glenn W.},
+  title     = {Verification of Forecasts Expressed in Terms of Probability},
+  journal   = {Monthly Weather Review},
+  volume    = {78},
+  number    = {1},
+  pages     = {1--3},
+  year      = {1950}
+}
+
+@inproceedings{nixon2019measuring,
+  author    = {Nixon, Jeremy and Dusenberry, Michael W. and Zhang, Linchuan and Jerfel, Ghassen and Tran, Dustin},
+  title     = {Measuring Calibration in Deep Learning},
+  booktitle = {CVPR Workshops},
+  year      = {2019}
+}
+
+@inproceedings{kumar2019verified,
+  author    = {Kumar, Ananya and Liang, Percy S. and Ma, Tengyu},
+  title     = {Verified Uncertainty Calibration},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {32},
+  year      = {2019}
+}
+
+@inproceedings{roelofs2022mitigating,
+  author    = {Roelofs, Rebecca and Cain, Nicholas and Shlens, Jonathon and Mozer, Michael C.},
+  title     = {Mitigating Bias in Calibration Error Estimation},
+  booktitle = {Proceedings of the 25th International Conference on Artificial Intelligence and Statistics (AISTATS)},
+  series    = {PMLR},
+  volume    = {151},
+  pages     = {4036--4054},
+  year      = {2022}
+}
+
+@inproceedings{gruber2022proper,
+  author    = {Gruber, Sebastian G. and Buettner, Florian},
+  title     = {Better Uncertainty Calibration via Proper Scores for Classification and Beyond},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {35},
+  year      = {2022}
+}
+
+% ---------------------------------------------------------------------------
+% Backbones, adaptation, and foundation models
+% ---------------------------------------------------------------------------
+
+@inproceedings{dosovitskiy2021vit,
+  author    = {Dosovitskiy, Alexey and Beyer, Lucas and Kolesnikov, Alexander and Weissenborn, Dirk and Zhai, Xiaohua and Unterthiner, Thomas and Dehghani, Mostafa and Minderer, Matthias and Heigold, Georg and Gelly, Sylvain and Uszkoreit, Jakob and Houlsby, Neil},
+  title     = {An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2021}
+}
+
+@inproceedings{he2016resnet,
+  author    = {He, Kaiming and Zhang, Xiangyu and Ren, Shaoqing and Sun, Jian},
+  title     = {Deep Residual Learning for Image Recognition},
+  booktitle = {Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
+  pages     = {770--778},
+  year      = {2016}
+}
+
+@inproceedings{radford2021clip,
+  author    = {Radford, Alec and Kim, Jong Wook and Hallacy, Chris and Ramesh, Aditya and Goh, Gabriel and Agarwal, Sandhini and Sastry, Girish and Askell, Amanda and Mishkin, Pamela and Clark, Jack and Krueger, Gretchen and Sutskever, Ilya},
+  title     = {Learning Transferable Visual Models From Natural Language Supervision},
+  booktitle = {Proceedings of the 38th International Conference on Machine Learning (ICML)},
+  series    = {PMLR},
+  volume    = {139},
+  year      = {2021}
+}
+
+@inproceedings{hu2022lora,
+  author    = {Hu, Edward J. and Shen, Yelong and Wallis, Phillip and Allen-Zhu, Zeyuan and Li, Yuanzhi and Wang, Shean and Wang, Lu and Chen, Weizhu},
+  title     = {{LoRA}: Low-Rank Adaptation of Large Language Models},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2022}
+}
+
+@article{moor2023generalist,
+  author    = {Moor, Michael and Banerjee, Oishi and Abad, Zahra Shakeri Hossein and Krumholz, Harlan M. and Leskovec, Jure and Topol, Eric J. and Rajpurkar, Pranav},
+  title     = {Foundation Models for Generalist Medical Artificial Intelligence},
+  journal   = {Nature},
+  volume    = {616},
+  year      = {2023}
+}
+
+@inproceedings{nguyen2023lvmmed,
+  author    = {Nguyen, Duy M. H. and Nguyen, Hoang and Diep, Nghiem T. and Pham, Tan N. and others},
+  title     = {{LVM-Med}: Learning Large-Scale Self-Supervised Vision Models for Medical Imaging via Second-order Graph Matching},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {36},
+  year      = {2023}
+}
+
+@article{oquab2024dinov2,
+  author    = {Oquab, Maxime and Darcet, Timoth{\'e}e and Moutakanni, Th{\'e}o and Vo, Huy and Szafraniec, Marc and Khalidov, Vasil and Fernandez, Pierre and Haziza, Daniel and Massa, Francisco and El-Nouby, Alaaeldin and others},
+  title     = {{DINOv2}: Learning Robust Visual Features without Supervision},
+  journal   = {Transactions on Machine Learning Research},
+  year      = {2024}
+}
+
+@article{zhang2025biomedclip,
+  author    = {Zhang, Sheng and Xu, Yanbo and Usuyama, Naoto and Xu, Hanwen and Bagga, Jaspreet and Tinn, Robert and Preston, Sam and Rao, Rajesh and Wei, Mu and Valluri, Naveen and others},
+  title     = {A Multimodal Biomedical Foundation Model Trained from Fifteen Million Image-Text Pairs},
+  journal   = {NEJM AI},
+  volume    = {2},
+  number    = {1},
+  year      = {2025},
+  doi       = {10.1056/AIoa2400640}
+}
+
+% ---------------------------------------------------------------------------
+% Datasets with demographic labels
+% ---------------------------------------------------------------------------
+
+@article{tschandl2018ham10000,
+  author    = {Tschandl, Philipp and Rosendahl, Cliff and Kittler, Harald},
+  title     = {The {HAM10000} Dataset, a Large Collection of Multi-Source Dermatoscopic Images of Common Pigmented Skin Lesions},
+  journal   = {Scientific Data},
+  volume    = {5},
+  pages     = {180161},
+  year      = {2018},
+  doi       = {10.1038/sdata.2018.161}
+}
+
+@inproceedings{irvin2019chexpert,
+  author    = {Irvin, Jeremy and Rajpurkar, Pranav and Ko, Michael and Yu, Yifan and Ciurea-Ilcus, Silviana and Chute, Chris and Marklund, Henrik and Haghgoo, Behzad and Ball, Robyn and Shpanskaya, Katie and others},
+  title     = {{CheXpert}: A Large Chest Radiograph Dataset with Uncertainty Labels and Expert Comparison},
+  booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence},
+  volume    = {33},
+  year      = {2019}
+}
+
+@inproceedings{groh2021fitzpatrick,
+  author    = {Groh, Matthew and Harris, Caleb and Soenksen, Luis and Lau, Felix and Han, Rachel and Kim, Aerin and Koochek, Arash and Badri, Omar},
+  title     = {Evaluating Deep Neural Networks Trained on Clinical Images in Dermatology with the {Fitzpatrick 17k} Dataset},
+  booktitle = {CVPR Workshops},
+  year      = {2021}
+}
+
+@article{abhishek2025quality,
+  author    = {Abhishek, Kumar and Jain, Aditi and Hamarneh, Ghassan},
+  title     = {Investigating the Quality of {DermaMNIST} and {Fitzpatrick17k} Dermatological Image Datasets},
+  journal   = {Scientific Data},
+  volume    = {12},
+  pages     = {196},
+  year      = {2025},
+  doi       = {10.1038/s41597-025-04382-5}
+}

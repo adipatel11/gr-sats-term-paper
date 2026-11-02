@@ -1,0 +1,1 @@
+Present the developed methodology and experimental study. The project should include a detailed description of the proposed/selected approach, an illustrative methodology/model figure where appropriate, comparison with meaningful baselines, effectiveness and/or efficiency evaluation, preliminary or completed experimental results, and optional ablation analysis where relevant.
