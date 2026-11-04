@@ -1,6 +1,7 @@
 # runs a frozen backbone over every image of one dataset and saves the features.
 # run from code/: python -m scripts.extract_features --dataset ham --backbone dinov2
 import argparse
+import os
 
 import numpy as np
 import torch
@@ -22,8 +23,12 @@ def main():
         print(f"{out.name} already done, skipping")
         return
 
-    device = "cuda" if torch.cuda.is_available() else "cpu"
     df = LOADERS[args.dataset]()
+    missing = sum(not os.path.exists(p) for p in df["path"])
+    if missing:  # fail now with a clear message instead of deep inside the dataloader
+        raise SystemExit(f"{missing} {args.dataset} images not found, check the unzip step")
+
+    device = "cuda" if torch.cuda.is_available() else "cpu"
     encode, transform = load_backbone(args.backbone, device)
     X = extract(encode, transform, df["path"], device, BATCH_SIZE)
 
