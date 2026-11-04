@@ -13,7 +13,7 @@ def load_ham():
 
     # images are split across the two unzipped part_1 / part_2 folders
     folder = DATA / "HAM10000" / "dataverse_files"
-    paths = {p.stem: str(p) for p in folder.glob("HAM10000_images_part_*/*.jpg")}
+    paths = {p.stem: str(p) for p in folder.glob("HAM10000_images_part_*/**/*.jpg")}
 
     return pd.DataFrame({
         "id": df["image_id"],
