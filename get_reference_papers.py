@@ -1,28 +1,14 @@
-#!/usr/bin/env python3
-"""Download a PDF for every entry in references.bib into "Reference papers/".
-
-Run from anywhere:
-    python3 get_reference_papers.py
-
-Only uses the Python standard library. Files are saved as <bibkey>.pdf and
-existing files are skipped, so it is safe to run again. For arXiv papers the
-title on arXiv is compared with the title in references.bib and a warning is
-printed if they do not match.
-"""
-
+# downloads a pdf for every paper in references.bib into "Reference papers/"
+# saved as <bibkey>.pdf, papers that are already there get skipped
 import re
-import sys
 import time
 import urllib.request
-import xml.etree.ElementTree as ET
 from pathlib import Path
 
-HERE = Path(__file__).resolve().parent
-PROJECT = HERE / "AditPatel_BiomedicalML_CSE_8673"
-BIB = PROJECT / "references.bib"
+PROJECT = Path(__file__).resolve().parent / "AditPatel_BiomedicalML_CSE_8673"
 OUT = PROJECT / "Reference papers"
 
-# bib key -> arXiv id, or a direct PDF URL for papers not on arXiv.
+# bib key -> arxiv id or a direct pdf link
 SOURCES = {
     "tomani2023dac": "2302.05118",
     "jin2024fairmedfm": "2407.00983",
@@ -54,7 +40,6 @@ SOURCES = {
     "nguyen2023lvmmed": "2306.11925",
     "he2016resnet": "1512.03385",
     "hu2022lora": "2106.09685",
-    # Added with the Phase 1 survey. arXiv ids checked against arXiv titles on 2026-10-04.
     "kull2019dirichlet": "1910.12656",
     "zhang2020mixnmatch": "2003.07329",
     "gupta2021splines": "2006.12800",
@@ -97,14 +82,12 @@ SOURCES = {
     "roelofs2022mitigating": "2012.08668",
     "gruber2022proper": "2203.07835",
     "radford2021clip": "2103.00020",
-    # Added from the Connected Papers graphs of the two seeds on 2026-10-06.
     "hekler2023tta": "https://ojs.aaai.org/index.php/AAAI/article/view/26735/26507",
     "yang2023beyond": "2306.04985",
     "tian2024fairdomain": "2407.08813",
 }
 
-# Papers with no free PDF link the script can rely on. Get these by hand
-# (through the MSU library if they are paywalled) and save them as <bibkey>.pdf.
+# no free link for these, get them by hand and save as <bibkey>.pdf
 MANUAL = {
     "platt1999probabilistic": "book chapter, Advances in Large Margin Classifiers (MIT Press, 1999)",
     "zadrozny2002transforming": "KDD 2002, ACM Digital Library",
@@ -114,99 +97,27 @@ MANUAL = {
     "brier1950verification": "Monthly Weather Review 78(1), AMS journals site",
 }
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (CSE 8673 reference collector)",
-    "Accept": "application/pdf,*/*",
-}
+keys = re.findall(r"@\w+\{([^,]+),", (PROJECT / "references.bib").read_text(encoding="utf-8"))
+OUT.mkdir(exist_ok=True)
 
+for key in keys:
+    dest = OUT / f"{key}.pdf"
+    if dest.exists():
+        continue
+    if key not in SOURCES:
+        print(f"get by hand: {key} ({MANUAL.get(key, 'no source listed')})")
+        continue
 
-def fetch(url):
-    req = urllib.request.Request(url, headers=HEADERS)
-    with urllib.request.urlopen(req, timeout=60) as resp:
-        return resp.read()
+    src = SOURCES[key]
+    url = src if src.startswith("http") else f"https://arxiv.org/pdf/{src}"
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        pdf = urllib.request.urlopen(req, timeout=60).read()
+        assert pdf.startswith(b"%PDF"), "not a pdf"
+        dest.write_bytes(pdf)
+        print(f"saved {key}")
+    except Exception as e:
+        print(f"failed {key}: {e}")
+    time.sleep(3)  # arxiv asks for a few seconds between requests
 
-
-def bib_titles(text):
-    """Return {key: title} from a .bib file."""
-    titles = {}
-    for m in re.finditer(r"@\w+\{([^,]+),(.*?)\n\}", text, re.S):
-        key, body = m.group(1).strip(), m.group(2)
-        t = re.search(r"title\s*=\s*\{(.*)\},?\s*$", body, re.M)
-        if t:
-            titles[key] = t.group(1)
-    return titles
-
-
-def words(s):
-    s = re.sub(r"\\['`^\"~]\{?(\w)\}?", r"\1", s)  # strip LaTeX accents
-    return set(re.findall(r"[a-z0-9]+", s.lower()))
-
-
-def arxiv_title(arxiv_id):
-    xml = fetch(f"https://export.arxiv.org/api/query?id_list={arxiv_id}")
-    ns = {"a": "http://www.w3.org/2005/Atom"}
-    entry = ET.fromstring(xml).find("a:entry", ns)
-    return " ".join(entry.find("a:title", ns).text.split())
-
-
-def main():
-    titles = bib_titles(BIB.read_text(encoding="utf-8"))
-    missing = sorted(set(titles) - set(SOURCES) - set(MANUAL))
-    if missing:
-        print("No source listed for:", ", ".join(missing))
-
-    OUT.mkdir(exist_ok=True)
-    failed = []
-    for key in titles:
-        if key not in SOURCES:
-            continue
-        dest = OUT / f"{key}.pdf"
-        if dest.exists():
-            print(f"skip   {key} (already downloaded)")
-            continue
-        src = SOURCES[key]
-        is_arxiv = not src.startswith("http")
-        urls = (
-            [f"https://arxiv.org/pdf/{src}", f"https://export.arxiv.org/pdf/{src}"]
-            if is_arxiv
-            else [src]
-        )
-        try:
-            # Check the arXiv title first so a wrong id never saves a wrong paper.
-            if is_arxiv:
-                found = arxiv_title(src)
-                a, b = words(found), words(titles[key])
-                if len(a & b) < 0.6 * min(len(a), len(b)):
-                    raise ValueError(f"title mismatch, arXiv {src} is '{found}'")
-            data, err = None, None
-            for url in urls:
-                try:
-                    data = fetch(url)
-                    break
-                except Exception as e:
-                    err = e
-            if data is None:
-                raise err
-            if not data.startswith(b"%PDF"):
-                raise ValueError("response was not a PDF")
-            dest.write_bytes(data)
-            print(f"saved  {key} ({len(data) // 1024} KB)")
-        except Exception as e:  # keep going so one bad link does not stop the rest
-            print(f"FAILED {key}: {e}")
-            failed.append(key)
-        time.sleep(3)  # arXiv asks for a few seconds between requests
-
-    manual = [k for k in titles if k in MANUAL and not (OUT / f"{k}.pdf").exists()]
-    have = sum((OUT / f"{k}.pdf").exists() for k in titles)
-    print(f"\nDone. {have} of {len(titles)} papers in '{OUT}'.")
-    if manual:
-        print("Not downloadable by this script, save these by hand as <bibkey>.pdf:")
-        for k in manual:
-            print(f"  {k}: {MANUAL[k]}")
-    if failed:
-        print("Download these by hand:", ", ".join(failed))
-        sys.exit(1)
-
-
-if __name__ == "__main__":
-    main()
+print(f"{sum((OUT / f'{k}.pdf').exists() for k in keys)} of {len(keys)} papers downloaded")

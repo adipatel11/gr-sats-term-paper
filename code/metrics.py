@@ -1,14 +1,17 @@
 import pandas as pd
 from sklearn.metrics import log_loss, roc_auc_score
 
-# TODO: ECE and brier once the calibrators are in
+# TODO: ECE and brier
 
 
 def group_metrics(df, group_cols):
-    """AUC and NLL for all images and for each group. df needs columns y and p (prob of malignant)."""
-    parts = [("all", df)] + [(g, d) for col in group_cols for g, d in df.groupby(col)]
+    # df needs columns y and p (prob of malignant)
+    groups = [("all", df)]
+    for col in group_cols:
+        groups += list(df.groupby(col))
+
     rows = []
-    for name, d in parts:
+    for name, d in groups:
         rows.append({
             "group": name,
             "n": len(d),

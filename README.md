@@ -32,4 +32,4 @@ I compile on Overleaf. Upload the contents of `AditPatel_BiomedicalML_CSE_8673/`
 
 ## Status
 
-Phase 2 (methodology and experiment plan) is done. Phase 3 (experiments and results) is in progress, so there is no experiment code here yet.
+Phase 2 (methodology and experiment plan) is done. Phase 3 (experiments and results) is in progress. The experiment code is in `code/`.
