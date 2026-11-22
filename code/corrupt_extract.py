@@ -3,6 +3,7 @@
 # just run it again and the finished corruptions get skipped
 # python corrupt_extract.py --dataset ham --models frozen
 # python corrupt_extract.py --dataset ham --models lora
+# python corrupt_extract.py --dataset fitz --models both   (frozen and lora from one pass)
 # python corrupt_extract.py --dataset ham --models frozen --test   (64 images, saves nothing)
 import argparse
 import random
@@ -64,6 +65,8 @@ class CorruptedImages(Dataset):
 
 
 def load_models(dataset, kind, device):
+    if kind == "both":
+        return {**load_models(dataset, "frozen", device), **load_models(dataset, "lora", device)}
     models = {}
     for bb in ["dinov2", "biomedclip"]:
         if kind == "frozen":
@@ -128,7 +131,7 @@ def test_run(images):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset", choices=["ham", "fitz"], required=True)
-    parser.add_argument("--models", choices=["frozen", "lora"], required=True)
+    parser.add_argument("--models", choices=["frozen", "lora", "both"], required=True)
     parser.add_argument("--test", action="store_true")
     args = parser.parse_args()
 
@@ -146,10 +149,14 @@ def main():
         test_run(images)
         return
 
+    # --models both corrupts each image once for the frozen and the lora models, which saves the
+    # cpu time of doing it twice. it still writes the usual two files per corruption
+    kinds = ["frozen", "lora"] if args.models == "both" else [args.models]
     for corruption in CORRUPTIONS:
-        path = OUT / f"{args.dataset}_c_{corruption}_{args.models}.npz"
-        if path.exists():
-            print(f"{path.name} already done")
+        paths = {k: OUT / f"{args.dataset}_c_{corruption}_{k}.npz" for k in kinds}
+        todo = [k for k in kinds if not paths[k].exists()]
+        if not todo:
+            print(f"{args.dataset}_c_{corruption} already done")
             continue
 
         res = {}
@@ -167,10 +174,12 @@ def main():
             arrays[key] = np.stack(v).astype(np.float16 if small else np.float32)
 
         # save under a temp name first so a disconnect can't leave half a file behind
-        tmp = path.with_suffix(".tmp.npz")
-        np.savez(tmp, ids=df["id"].to_numpy(dtype=str)[pool], **arrays)
-        tmp.rename(path)
-        print(f"saved {path.name}")
+        for k in todo:
+            tmp = paths[k].with_suffix(".tmp.npz")
+            part = {key: v for key, v in arrays.items() if ("frozen" in key) == (k == "frozen")}
+            np.savez(tmp, ids=df["id"].to_numpy(dtype=str)[pool], **part)
+            tmp.rename(paths[k])
+            print(f"saved {paths[k].name}")
 
 
 if __name__ == "__main__":
