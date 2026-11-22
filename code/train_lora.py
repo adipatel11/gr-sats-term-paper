@@ -11,7 +11,7 @@ from torchvision import transforms as T
 from tqdm import tqdm
 
 from config import BATCH_SIZE, LORA_EPOCHS, LORA_LR, LORA_PATIENCE, LORA_WD, OUT, SEEDS
-from data import GROUPS, LOADERS, ImageDataset, add_dev, missing_images
+from data import GROUPS, LOADERS, add_dev, load_images, missing_images
 from metrics import group_metrics
 from models import MEAN_STD, LoRAModel, load_backbone
 
@@ -30,13 +30,6 @@ class CachedImages(Dataset):
 
 def rotate90(x):
     return torch.rot90(x, int(torch.randint(4, (1,))), (1, 2))
-
-
-def load_images(paths):
-    # decode everything once, colab's 2 cpus are too slow to do it every epoch
-    crop = T.Compose([T.Resize(224), T.CenterCrop(224), T.PILToTensor()])
-    loader = DataLoader(ImageDataset(paths, crop), batch_size=BATCH_SIZE, num_workers=2)
-    return torch.cat(list(tqdm(loader, desc="loading images")))
 
 
 @torch.no_grad()

@@ -2,10 +2,13 @@ import os
 
 import numpy as np
 import pandas as pd
+import torch
 from PIL import Image
-from torch.utils.data import Dataset
+from torch.utils.data import DataLoader, Dataset
+from torchvision import transforms as T
+from tqdm import tqdm
 
-from config import DATA, DEV_FRAC
+from config import BATCH_SIZE, DATA, DEV_FRAC
 
 MALIGNANT = ["mel", "bcc", "akiec"]
 SKIN = {1: "I-II", 2: "I-II", 3: "III-IV", 4: "III-IV", 5: "V-VI", 6: "V-VI"}
@@ -73,3 +76,11 @@ class ImageDataset(Dataset):
 
     def __getitem__(self, i):
         return self.transform(Image.open(self.paths[i]).convert("RGB"))
+
+
+def load_images(paths):
+    # decode everything once as uint8, colab's 2 cpus are too slow to do it every epoch.
+    # same resize and crop as get_transform in models.py
+    crop = T.Compose([T.Resize(224), T.CenterCrop(224), T.PILToTensor()])
+    loader = DataLoader(ImageDataset(paths, crop), batch_size=BATCH_SIZE, num_workers=2)
+    return torch.cat(list(tqdm(loader, desc="loading images")))

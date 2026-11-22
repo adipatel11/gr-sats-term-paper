@@ -2,6 +2,7 @@
 # python train_probes.py --dataset ham --backbone dinov2
 import argparse
 
+import joblib
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
@@ -42,6 +43,8 @@ for seed in SEEDS:
     # logits for every image, the calibrators use these later
     logits = probe.decision_function(X)
     np.savez(OUT / f"{name}_lp_seed{seed}.npz", ids=f["ids"], split=d["split"].to_numpy(dtype=str), logits=logits)
+    # the probe itself too, the corrupted features need it
+    joblib.dump(probe, OUT / f"{name}_lp_seed{seed}.joblib")
 
     # clean results on the pool (val + test)
     d["p"] = probe.predict_proba(X)[:, 1]
