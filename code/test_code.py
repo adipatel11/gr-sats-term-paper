@@ -2,9 +2,10 @@
 import numpy as np
 import torch
 from scipy.optimize import minimize_scalar
+from scipy.special import expit
 from torch import nn
 
-from calibrate import fit, make_folds, positivity, weights
+from calibrate import atypicality, fit, fit_dac, make_folds, positivity, weights
 from data import add_dev, load_fitz, load_ham
 from models import LoRAqkv
 
@@ -105,3 +106,30 @@ def test_folds_keep_lesions_together():
     folds = make_folds(dp, "ham")
     assert set(folds) == {0, 1, 2, 3, 4}
     assert dp.assign(fold=folds).groupby("lesion")["fold"].nunique().max() == 1
+
+
+def test_aar_two_class_form():
+    # aar's softmax form with S_0, S_1 equals sigmoid(phi * z + S_1 - S_0) for a binary model
+    rng = np.random.default_rng(0)
+    z, phi, s0, s1 = rng.normal(size=4)
+    logp = np.array([np.log(1 - expit(z)), np.log(expit(z))])
+    scores = phi * logp + np.array([s0, s1])
+    softmax = np.exp(scores[1]) / np.exp(scores).sum()
+    assert abs(softmax - expit(phi * z + s1 - s0)) < 1e-12
+
+
+def test_dac_with_constant_distance_is_temperature_scaling():
+    z, y = fake_logits()
+    w = np.full(len(z), 1 / len(z))
+    predict, p = fit_dac(z, np.ones(len(z)), y, w)
+    T = p[0] + p[1]
+    brier = lambda t: np.mean((expit(z / t) - y) ** 2)
+    assert abs(T - minimize_scalar(brier, bounds=(0.1, 10), method="bounded").x) < 1e-2
+
+
+def test_atypical_points_score_higher():
+    rng = np.random.default_rng(0)
+    bank = rng.normal(size=(500, 8))
+    bank_y = rng.integers(2, size=500)
+    a = atypicality(bank, bank_y, np.stack([np.zeros(8), np.full(8, 5.0)]))
+    assert a[1] > a[0]
