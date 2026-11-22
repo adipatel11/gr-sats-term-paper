@@ -14,6 +14,18 @@ def ece(y, p, bins=15):
     return sum(gaps) / len(p)
 
 
+def debiased_ce(y, p, bins=15):
+    # kumar et al. 2019 (def. 5.2): squared calibration error over the same equal-mass bins, minus
+    # the label variance in each bin, which is what makes the plain estimate too high with few images.
+    # square root at the end so it reads on the same scale as ece
+    y, p = np.asarray(y), np.asarray(p)
+    total = 0
+    for b in np.array_split(np.argsort(p), bins):
+        yb = y[b].mean()
+        total += len(b) / len(p) * ((p[b].mean() - yb) ** 2 - yb * (1 - yb) / (len(b) - 1))
+    return np.sqrt(max(total, 0))
+
+
 def group_metrics(df, group_cols):
     # df needs columns y and p (prob of malignant)
     groups = [("all", df)]

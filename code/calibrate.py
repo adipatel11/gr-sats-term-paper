@@ -141,14 +141,14 @@ def weights(loss, sev, masks):
     return W
 
 
-def fit(A, y, W, C):
-    # minimize t subject to L_g(theta) <= t for every group and C @ theta >= EPS (epigraph form).
-    # each L_g is a weighted logistic loss of A @ theta, so the problem is convex
+def fit(A, y, W, C, offset=0):
+    # minimize t subject to L_g(theta) - offset_g <= t for every group and C @ theta >= EPS
+    # (epigraph form). each L_g is a weighted logistic loss of A @ theta, so the problem is convex
     p = A.shape[1]
 
     def losses(theta):
         u = A @ theta
-        return W @ (np.logaddexp(0, u) - y * u)
+        return W @ (np.logaddexp(0, u) - y * u) - offset
 
     def grads(theta):
         return (W * (expit(A @ theta) - y)) @ A
@@ -215,9 +215,9 @@ def fit_aar(z, a, y, w):
     return predict, res.x
 
 
-def fit_method(name, z0, zc, sc, y, masks, imgs, corrs):
+def fit_method(name, z0, zc, sc, y, masks, imgs, corrs, methods=METHODS):
     # fits one calibrator and returns a function that predicts from logits, distances and atypicality
-    form, loss = METHODS[name]
+    form, loss = methods[name]
     z, d, a, sev, img = stack_rows(z0, zc, sc, imgs, corrs)
     W = weights(loss, sev, [g[img] for g in masks])
     if form == "dac":
@@ -229,7 +229,16 @@ def fit_method(name, z0, zc, sc, y, masks, imgs, corrs):
     m, r = ld[sev == 0].mean(), ld[sev == 0].std()
     s = (ld - m) / r
     smin, smax = s.min(), s.max()
-    theta = fit(design(z, s, form), y[img], W, positivity(form, smin, smax))
+    A, C = design(z, s, form), positivity(form, smin, smax)
+    offset = 0
+    if loss == "excess":
+        # excess loss: each group's loss minus the lowest loss that group could get on its own
+        offset = []
+        for g in range(len(W)):
+            u = A @ fit(A, y[img], W[g:g + 1], C)
+            offset.append(W[g] @ (np.logaddexp(0, u) - y[img] * u))
+        offset = np.array(offset)
+    theta = fit(A, y[img], W, C, offset)
 
     def predict(zz, dd, aa):
         ss = np.clip((np.log(dd) - m) / r, smin, smax)

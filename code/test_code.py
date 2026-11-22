@@ -6,7 +6,9 @@ from scipy.special import expit
 from torch import nn
 
 from calibrate import atypicality, fit, fit_dac, make_folds, positivity, weights
+from calibrate_extra import fit_dac_nll, fit_md_ts
 from data import add_dev, load_fitz, load_ham
+from metrics import debiased_ce
 from models import LoRAqkv
 
 
@@ -133,3 +135,35 @@ def test_atypical_points_score_higher():
     bank_y = rng.integers(2, size=500)
     a = atypicality(bank, bank_y, np.stack([np.zeros(8), np.full(8, 5.0)]))
     assert a[1] > a[0]
+
+
+def test_offset_does_not_move_a_one_group_fit():
+    # with one group, subtracting its best loss (the excess version) can't change the answer
+    z, y = fake_logits()
+    s = np.linspace(-2, 8, len(z))
+    sev = np.repeat(np.arange(6), len(z) // 6 + 1)[:len(z)]
+    A, W, C = np.stack([z, s * z], 1), weights("avg", sev, []), positivity("shift", s.min(), s.max())
+    assert np.allclose(fit(A, y, W, C), fit(A, y, W, C, offset=np.array([0.3])), atol=1e-4)
+
+
+def test_dac_nll_with_constant_distance_is_temperature_scaling():
+    z, y = fake_logits()
+    _, p = fit_dac_nll(z, np.ones(len(z)), y, np.full((1, len(z)), 1 / len(z)), [[1.0, 1.0]])
+    nll = lambda t: np.mean(np.logaddexp(0, z / t) - y * z / t)
+    assert abs(p[0] + p[1] - minimize_scalar(nll, bounds=(0.1, 10), method="bounded").x) < 1e-2
+
+
+def test_md_ts_with_one_domain_is_temperature_scaling():
+    z, y = fake_logits()
+    X = np.random.default_rng(0).normal(size=(len(z), 4))
+    predict, _ = fit_md_ts(z, X, y, np.zeros(len(z), int), np.full(len(z), -1))
+    beta = fit(z[:, None], y, np.full((1, len(z)), 1 / len(z)), positivity("global", 0, 0))[0]
+    assert np.allclose(predict({"z": z, "X": X}), expit(beta * z), atol=1e-6)
+
+
+def test_debiased_ce():
+    rng = np.random.default_rng(0)
+    p = rng.uniform(size=20000)
+    y = (rng.uniform(size=20000) < p).astype(float)
+    assert debiased_ce(y, p) < 0.01                                   # calibrated
+    assert abs(debiased_ce(y, np.clip(p + 0.1, 0, 1)) - 0.1) < 0.02   # off by about 0.1
