@@ -1,7 +1,10 @@
 # python -m pytest -q
+import numpy as np
 import torch
+from scipy.optimize import minimize_scalar
 from torch import nn
 
+from calibrate import fit, make_folds, positivity, weights
 from data import add_dev, load_fitz, load_ham
 from models import LoRAqkv
 
@@ -69,3 +72,36 @@ def test_lora_only_changes_q_and_v():
     assert diff[..., :16].sum() > 0     # q moved
     assert diff[..., 16:32].sum() == 0  # k did not
     assert diff[..., 32:].sum() > 0     # v moved
+
+
+def fake_logits(n=2000, seed=0):
+    rng = np.random.default_rng(seed)
+    y = rng.integers(2, size=n).astype(float)
+    z = 3 * (2 * y - 1) + 2 * rng.standard_normal(n)  # overconfident logits
+    return z, y
+
+
+def test_global_fit_is_temperature_scaling():
+    z, y = fake_logits()
+    sev = np.zeros(len(z), int)
+    beta = fit(z[:, None], y, weights("clean", sev, []), positivity("global", 0, 0))[0]
+    nll = lambda b: np.mean(np.logaddexp(0, b * z) - y * b * z)
+    assert abs(beta - minimize_scalar(nll, bounds=(0.01, 10), method="bounded").x) < 1e-3
+
+
+def test_shift_fit_never_flips_predictions():
+    z, y = fake_logits()
+    s = np.linspace(-2, 8, len(z))
+    sev = np.repeat(np.arange(6), len(z) // 6 + 1)[:len(z)]
+    theta = fit(np.stack([z, s * z], 1), y, weights("avg", sev, []), positivity("shift", s.min(), s.max()))
+    beta = theta[0] + theta[1] * s
+    assert (beta >= 0.05 - 1e-6).all()
+    assert ((beta * z > 0) == (z > 0)).all()
+
+
+def test_folds_keep_lesions_together():
+    df = load_ham()
+    dp = df[df["split"].isin(["val", "test"])].reset_index(drop=True)
+    folds = make_folds(dp, "ham")
+    assert set(folds) == {0, 1, 2, 3, 4}
+    assert dp.assign(fold=folds).groupby("lesion")["fold"].nunique().max() == 1

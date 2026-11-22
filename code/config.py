@@ -18,3 +18,18 @@ LORA_LR = 3e-4
 LORA_WD = 0.01
 LORA_EPOCHS = 20
 LORA_PATIENCE = 5
+
+# calibration settings from the paper
+KNN_K = 10
+EPS = 0.05  # smallest inverse temperature allowed
+N_FOLDS = 5
+N_BOOT = 2000
+
+# the 5 medmnist-c families, only the 15 derm corruptions
+FAMILIES = {
+    "digital": ["pixelate", "jpeg_compression"],
+    "noise": ["gaussian_noise", "speckle_noise", "impulse_noise", "shot_noise"],
+    "blur": ["defocus_blur", "motion_blur", "zoom_blur"],
+    "color": ["brightness_up", "brightness_down", "contrast_up", "contrast_down"],
+    "task-specific": ["black_corner", "characters"],
+}

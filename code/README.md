@@ -13,6 +13,7 @@ Code for the experiments in the paper. So far it loads the two datasets, trains 
 - `train_probes.py`: linear probes on the saved features (CPU is fine)
 - `train_lora.py`: LoRA models (GPU)
 - `corrupt_extract.py`: runs the 15 MedMNIST-C corruptions at 5 severities over the val + test images and saves every model's outputs (GPU)
+- `calibrate.py`: fits TS, GR-SATS and the other calibrators on the corrupted outputs with cross-fitting and compares them (CPU is fine)
 - `test_code.py`: tests, run with `python -m pytest -q`
 - `notebooks/`: what I run on Colab
 
@@ -27,6 +28,7 @@ python extract_features.py --dataset ham --backbone dinov2
 python train_probes.py --dataset ham --backbone dinov2
 python train_lora.py --dataset ham --backbone dinov2
 python corrupt_extract.py --dataset ham --models frozen
+python calibrate.py --dataset ham --models frozen
 ```
 
 `--dataset` is `ham` or `fitz` and `--backbone` is `dinov2` or `biomedclip`. If Colab disconnects during `train_lora.py`, run the same command again and it picks up from the last epoch. `corrupt_extract.py` works the same way, finished corruptions get skipped.
