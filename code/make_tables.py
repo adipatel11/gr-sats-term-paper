@@ -1,5 +1,5 @@
-# makes the paper's tables (latex, in tables/) and figures (matplotlib pdfs, in figures/) from the
-# csvs in results/. every number in the paper comes from here or from rank_tests.py
+# makes the paper's tables (latex, in tables/) and figures (matplotlib pdfs and pngs, in figures/) from
+# the csvs in results/. every number in the paper comes from here or from rank_tests.py
 # python make_tables.py
 from pathlib import Path
 
@@ -169,7 +169,9 @@ def family_table(det):
 
 def save(fig, name):
     FIGURES.mkdir(exist_ok=True)
+    # pdf for the paper, png for the poster and the phase 4 zip
     fig.savefig(FIGURES / name, bbox_inches="tight")
+    fig.savefig((FIGURES / name).with_suffix(".png"), bbox_inches="tight", dpi=600)
     plt.close(fig)
     print(f"wrote figures/{name}")
 
@@ -204,14 +206,15 @@ def groups_figure(det):
                 & det["family"].isin(POOL_FAMS[ds] + ["clean"])]
         curve = d.groupby(["model", "seed", "group", "severity"])["nll"].mean().groupby(["group", "severity"]).mean()
         for g in curve.index.get_level_values(0).unique():
-            y = curve.loc[g].to_numpy()
-            line, = ax.plot(range(6), y, marker="o", ms=2.5, lw=0.9)
-            ax.text(5.25, y[-1], g, va="center", fontsize=6, color=line.get_color())  # label at the line's end
+            ax.plot(range(6), curve.loc[g].to_numpy(), marker="o", ms=2.5, lw=0.9, label=g)
         ax.set_title("HAM10000" if ds == "ham" else "Fitzpatrick17k")
         ax.set_xlabel("Severity (0 = clean)")
         ax.set_xticks(range(6))
-        ax.set_xlim(-0.3, 6.4)
+        ax.set_ylim(0, curve.max() * 1.4)  # room for the legend above the lines
         ax.grid(alpha=0.3, lw=0.5)
+        # legend in the same order as the lines, top to bottom
+        pairs = sorted(zip(*ax.get_legend_handles_labels()), key=lambda p: -p[0].get_ydata()[-1])
+        ax.legend(*zip(*pairs), loc="upper left", ncol=2, frameon=False, handlelength=1.2, columnspacing=0.8)
     axes[0].set_ylabel("NLL, clean-fit TS")
     fig.tight_layout()
     save(fig, "groups.pdf")
@@ -253,7 +256,7 @@ def cd_figure(ranks, cd):
     k = len(order)
     fig, ax = plt.subplots(figsize=(3.4, 1.5))
     ax.set_xlim(0.2, k + 0.8)
-    ax.set_ylim(-1.15, 0.45)
+    ax.set_ylim(-1.35, 0.45)
     ax.axis("off")
     ax.plot([1, k], [0, 0], color="black", lw=0.8)
     for r in range(1, k + 1):
@@ -278,6 +281,7 @@ def cd_figure(ranks, cd):
     for n, (i, j) in enumerate(cliques):
         y = -0.1 - 0.07 * n
         ax.plot([order.iloc[i] - 0.05, order.iloc[j] + 0.05], [y, y], color="black", lw=2)
+    ax.text((1 + k) / 2, -1.3, "Mean rank by worst-group NLL (lower is better)", ha="center", va="bottom")
     save(fig, "cd.pdf")
 
 

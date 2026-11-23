@@ -16,7 +16,7 @@ Code for the experiments in the paper. It loads the two datasets, trains the lin
 - `calibrate.py`: fits TS, GR-SATS and the other calibrators on the corrupted outputs with cross-fitting and compares them (CPU is fine)
 - `calibrate_extra.py`: the extra baselines, ablations and oracles, refits the `calibrate.py` methods too and checks them against `results/` (CPU is fine)
 - `rank_tests.py`: Friedman + Nemenyi, H2, and the pooled bootstrap success test over all 8 settings (local)
-- `make_tables.py`: the LaTeX tables in `tables/` and the matplotlib figures in `figures/`, all read from `results/` (local)
+- `make_tables.py`: the LaTeX tables in `tables/` and the matplotlib figures in `figures/` (PDF for the paper, PNG for the poster), all read from `results/` (local)
 - `results/`: result CSVs for the 8 settings, `rank_tests.txt` is the saved output of `rank_tests.py`
 - `test_code.py`: tests, run with `python -m pytest -q`
 - `notebooks/`: what I run on Colab

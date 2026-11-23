@@ -85,13 +85,26 @@ All losses are on HAM BiomedCLIP LoRA.
   - Per family: GR-SATS gains most on noise (HAM .572 vs TS corr .728), while TS corr is best on HAM color and task-specific.
   - Reliability: without calibration HAM 60+ risk is underestimated under corruption, GR-SATS is closest to the diagonal.
 
+## What wasn't run (for the poster and for questions)
+
+Poster text:
+
+**Not run:** official DAC and AAR code (both are reimplementations, DAC uses the final layer only), TS with unrelated textures, ImageNet ViT, full fine-tuning, a from-scratch rerun of one setting, per-severity reliability diagrams, and per-group ECE by severity.
+
+If asked:
+
+- Official code: I reimplemented DAC and AAR from the papers and DAC's published code and checked DAC with a unit test (constant distance gives plain TS). I never compared numbers with the official code, so a full 13-layer DAC could be stronger.
+- Textures: Roschewitz et al. found this the most robust simple method, so it's the missing baseline that matters most.
+- ImageNet ViT and full fine-tuning: stretch goals, dropped for time.
+- From-scratch rerun: not done. The probe refit and the calibrator refits (5.6e-17) matched. LoRA was trained once per seed.
+- Everything else in the results is finished: 8 settings, 3 seeds, 15 corruptions, 5 severities.
+
 ## Next steps, in order
 
-1. Put `code/tables/*.tex` and `code/figures/*.pdf` into Overleaf (`\input{tables/results}` and `\includegraphics{figures/severity}`).
-2. Write the Results and Discussion sections, and make the edits above on Overleaf.
-3. Copy main.tex back into the folder and commit.
-4. Make the Phase 3 poster (single-slide PPTX, 15-minute presentation), figures from `code/figures/` only.
+Phase 3 poster is due Thursday, Nov 26, 2026 at 11:59pm (Phase 3 Canvas Discussions).
 
-Still unknown: the due dates of the final paper and the poster. Check them first.
+1. Done Nov 23: main.tex and the 4 figures updated on Overleaf, recompiled, and the new PDF is here. (Three claims fixed in the abstract, Contribution 1, 6.1, 6.4 and 7.2, legend added to `groups`, axis title added to `cd`.)
+2. Make the poster (single-slide PPTX), figures from `code/figures/` only.
+3. Write and rehearse the 15-minute talk.
 
-To pick up next time, open Claude Code in this folder and say "read NEXT_STEPS.md and start on make_tables.py".
+`make_tables.py` was rerun on Nov 23. The tables came out identical, and the new figures and main.tex are on Overleaf.
