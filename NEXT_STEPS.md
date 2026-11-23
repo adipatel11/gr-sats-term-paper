@@ -55,6 +55,7 @@ All losses are on HAM BiomedCLIP LoRA.
    - Clean ECE is .028 against .013 for clean TS, and within 0.01 of it in only 2 of 8 settings, so that criterion fails. The other two secondary criteria hold.
    - Patients under 60 get worse on HAM (NLL .152 to .174 against TS corr, mean risk 11.4% when 5.1% are malignant).
    - Clean worst-group NLL goes up about .01 on HAM.
+   - The ECE gap only shrinks for age (.058 to .038 against TS corr). It goes up for sex (.007 to .012) and skin type (.012 to .020), and V-VI ECE goes from .038 to .040. Overall ECE under corruption is .030, DAC and AAR are .024. Don't say GR-SATS makes the groups more equal in general.
 7. Clean TS is worse than no calibration on corrupted HAM images in all 4 settings. This supports the motivation.
 8. HAM BiomedCLIP LoRA is the weakest setting. In seeds 0 and 2, 60+ has lower clean scores than under 60, but the seeds where GR-SATS loses to TS-WG (1 and 2) don't line up with that, so don't claim it's the cause.
 9. AAR had one bad seed there (seed 1, .536) because its quadratic is unconstrained and extrapolates. That's how the original AAR works.
@@ -78,7 +79,7 @@ If asked:
 
 Phase 3 poster is due Thursday, Nov 26, 2026 at 11:59pm (Phase 3 Canvas Discussions).
 
-1. Done Nov 23: `main.tex` updated on Overleaf and the new PDF is here. Last edits: 5.4 (TS with corruptions is no longer called the strongest simple baseline), Table 2 row 2, 7.1 (NLL is still higher under corruption than on clean images), and the Figure 4 alt text and Figure 6 caption. Later the same day: 6.3 (excess NLL gives up all of the group-loss gain) and 7.5 (debiased ECE and per-attribute worst groups were planned but not reported). The figures and tables did not change.
+1. Done Nov 23: `main.tex` updated on Overleaf and the new PDF is here. Last edits: 5.4 (TS with corruptions is no longer called the strongest simple baseline), Table 2 row 2, 7.1 (NLL is still higher under corruption than on clean images), and the Figure 4 alt text and Figure 6 caption. Later the same day: 6.3 (excess NLL gives up all of the group-loss gain) and 7.5 (debiased ECE and per-attribute worst groups were planned but not reported). After that, 6.4 (the ECE gap between the sexes and between skin types goes up compared with TS corr) and y-axis labels on every panel of Figures 4, 5 and 6. The tables did not change.
 2. Make the poster (single-slide PPTX), figures from `code/figures/` only. `framework.png` is the method diagram and `taxonomy.png` is the literature figure. Its numbers in brackets are the paper's references.
 3. Write and rehearse the 15-minute talk. Check on Canvas if it's live or recorded.
 

@@ -189,7 +189,7 @@ def severity_figure(set_mean):
         ax.set_title(f"{SHORT[ds]}, {SHORT[kind]}, {SHORT[bb]}")
         ax.set_xticks(range(6))
         ax.grid(alpha=0.3, lw=0.5)
-    for ax in axes[:, 0]:
+    for ax in axes.ravel():
         ax.set_ylabel("Worst-group NLL")
     for ax in axes[1]:
         ax.set_xlabel("Severity (0 = clean)")
@@ -209,13 +209,13 @@ def groups_figure(det):
             ax.plot(range(6), curve.loc[g].to_numpy(), marker="o", ms=2.5, lw=0.9, label=g)
         ax.set_title("HAM10000" if ds == "ham" else "Fitzpatrick17k")
         ax.set_xlabel("Severity (0 = clean)")
+        ax.set_ylabel("NLL, clean-fit TS")
         ax.set_xticks(range(6))
         ax.set_ylim(0, curve.max() * 1.4)  # room for the legend above the lines
         ax.grid(alpha=0.3, lw=0.5)
         # legend in the same order as the lines, top to bottom
         pairs = sorted(zip(*ax.get_legend_handles_labels()), key=lambda p: -p[0].get_ydata()[-1])
         ax.legend(*zip(*pairs), loc="upper left", ncol=2, frameon=False, handlelength=1.2, columnspacing=0.8)
-    axes[0].set_ylabel("NLL, clean-fit TS")
     fig.tight_layout()
     save(fig, "groups.pdf")
 
@@ -239,11 +239,11 @@ def reliability_figure(rel, set_mean):
         ax.plot([0, 1], [0, 1], color="gray", lw=0.6, ls=":")
         ax.set_title(f"{'HAM10000' if ds == 'ham' else 'Fitzpatrick17k'}, group {g}")
         ax.set_xlabel("Predicted risk")
+        ax.set_ylabel("Fraction malignant")
         ax.set_xlim(0, 1)
         ax.set_ylim(0, 1)
         ax.set_aspect("equal")
         ax.grid(alpha=0.3, lw=0.5)
-    axes[0].set_ylabel("Fraction malignant")
     fig.tight_layout(rect=(0, 0, 1, 0.88))
     fig.legend(*axes[0].get_legend_handles_labels(), loc="upper center", ncol=len(methods), frameon=False,
                handlelength=1.2, columnspacing=0.8)
