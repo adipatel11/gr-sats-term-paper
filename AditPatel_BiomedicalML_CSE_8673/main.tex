@@ -6,9 +6,10 @@
 %% Phase 0 set the title and abstract. Phase 1 added the literature survey
 %% and the paper list in literature_list.csv. Phase 2 reorganized the paper
 %% to follow the course template (TERM_PAPER_TEMPLATE_DATAPOINTS): research
-%% challenges, proposed methodology, experimental methodology, planned
-%% results, the six-week plan, and the two required sections at the end.
-%% The Phase 1 version is in Overleaf's history.
+%% challenges, proposed methodology, experimental methodology, the six-week
+%% plan, and the two required sections at the end. The final version replaces
+%% the planned results with the real ones and adds the discussion.
+%% The earlier versions are in Overleaf's history.
 %%
 %% Compile with pdfLaTeX + BibTeX (Overleaf default).
 %% "nonacm" removes the ACM copyright block and reference-format box,
@@ -22,6 +23,7 @@
 
 \usepackage{amsmath}
 \usepackage{booktabs}
+\usepackage{graphicx}
 %% Figure 1 is drawn with plain TikZ instead of the forest package, because
 %% forest was too slow for Overleaf's 10-second free compile limit.
 \usepackage{tikz}
@@ -55,26 +57,25 @@
 \renewcommand{\shortauthors}{Patel}
 
 \begin{abstract}
-Medical foundation models are usually adapted by linear probing or LoRA
-and calibrated with temperature scaling on clean validation images. Real
-test images are often noisy, blurry, or badly lit, and a calibrator fit on
-clean data can then give overconfident risks, possibly more so for some
-patient groups, which could mislead biopsy decisions. Shift-aware
-calibrators target only average calibration, and group-aware ones assume
-test data look like calibration data. I propose Group-Robust Shift-Aware
-Temperature Scaling (GR-SATS), a post-hoc calibrator that sets a per-image
-temperature from a standardized nearest-neighbor shift score and fits its
-two parameters for the worst-off patient group. The fit is convex and needs
-group labels only while fitting. I will evaluate it on HAM10000 (sex and
-age groups) and Fitzpatrick17k (skin-type groups) with DINOv2 and
-BiomedCLIP adapted by linear probing and LoRA, on MedMNIST-C corruption
-families held out from fitting, at five severities. Baselines include
-temperature scaling variants, density-aware calibration,
-atypicality-aware recalibration, and cluster-wise temperature scaling, and
-the main metrics are worst-group negative log-likelihood and Brier score. The expected
-contribution is, as far as I know, the first worst-group, shift-aware
-post-hoc calibrator for medical imaging, plus a measurement of how subgroup
-calibration degrades under corruption.
+Medical foundation models are usually adapted by linear probing or LoRA and
+calibrated with temperature scaling on clean validation images. Real images
+are often noisy, blurry, or badly lit, and a calibrator fit on clean data can
+then give overconfident risks, possibly more so for some patient groups.
+Shift-aware calibrators target average calibration, and group-aware ones
+assume test data look like calibration data. I propose Group-Robust
+Shift-Aware Temperature Scaling (GR-SATS), a post-hoc calibrator that sets a
+per-image temperature from a nearest-neighbor shift score and fits its two
+parameters for the worst-off patient group. The fit is convex and needs group
+labels only while fitting. I test it on HAM10000 and Fitzpatrick17k with
+DINOv2 and BiomedCLIP adapted by linear probing and LoRA, on held-out
+MedMNIST-C corruption families. GR-SATS lowers worst-group negative
+log-likelihood by 0.044 against temperature scaling fit on corruptions, 0.013
+against density-aware calibration, and 0.022 against atypicality-aware
+recalibration, and all bootstrap intervals exclude zero. Most of the gain
+comes from noise corruptions, though, and clean calibration and the
+calibration of patients under 60 get worse. Fitting density-aware calibration
+for the worst group works just as well, so most of the improvement seems to
+come from the worst-group objective.
 \end{abstract}
 
 \begin{CCSXML}
@@ -110,15 +111,15 @@ Calibration is usually checked on clean validation images, but real images vary 
 
 Shift-aware calibrators such as density-aware calibration (DAC) keep average calibration under shift \cite{tomani2021posthoc,yu2022multidomain,tomani2023dac}, and atypicality-aware recalibration (AAR) helped the worst skin-tone group on clean images \cite{yuksekgonul2023atypicality}, but none of them targets the worst-off group under shift. Group-aware calibrators \cite{hebertjohnson2018multicalibration,salvador2022faircal} and worst-group training \cite{sagawa2020groupdro,shui2023clusterfocal} assume that test images look like the calibration or training images, even though fairness measured in distribution often does not hold out of distribution \cite{schrouff2022diagnosing,yang2024limits}. Medical fairness benchmarks such as MEDFAIR and FairMedFM report group calibration only on clean images or on dataset pairs without graded corruption \cite{zong2023medfair,jin2024fairmedfm}, and MedMNIST-C \cite{disalvo2024medmnistc} reports no calibration metrics at all. As far as I know, no published work in medical imaging has measured how subgroup calibration changes with corruption severity, or how that depends on the adaptation strategy. This leads to my research question. Can a post-hoc calibrator that sees only the image at test time keep the worst-off patient group calibrated under corruptions it was not fit on, and how does the answer depend on how the foundation model was adapted?
 
-I propose Group-Robust Shift-Aware Temperature Scaling (GR-SATS). Each image gets a shift score, the standardized log distance from its features to its nearest clean training images. The inverse temperature is a linear function of this score, and its two parameters are fit to minimize the negative log-likelihood (NLL) of the worst-off group, in the spirit of GroupDRO \cite{sagawa2020groupdro}. Corrupted images and images from rare groups both sit farther from the training data, so a temperature that rises with the shift score can lower confidence where predictions are least reliable, and the worst-group fit decides how fast it rises. Group labels are needed only while fitting, and the fit is convex. The expected contributions beyond existing work are as follows.
+I propose Group-Robust Shift-Aware Temperature Scaling (GR-SATS). Each image gets a shift score, the standardized log distance from its features to its nearest clean training images. The inverse temperature is a linear function of this score, and its two parameters are fit to minimize the negative log-likelihood (NLL) of the worst-off group, in the spirit of GroupDRO \cite{sagawa2020groupdro}. Corrupted images, and often images from rare groups, sit farther from the training data, so a temperature that rises with the shift score can lower confidence where predictions are least reliable, and the worst-group fit decides how fast it rises. Group labels are needed only while fitting, and the fit is convex. My contributions are listed below.
 
 \begin{itemize}
-  \item \textbf{A worst-group, shift-aware calibrator.} Unlike DAC and AAR, which are fit for average calibration, GR-SATS is fit for the worst-off group. Its two-parameter fit is convex, and it needs no group labels at test time. I also test a worst-group version of DAC, the seed method.
-  \item \textbf{A measurement of subgroup calibration under corruption.} MEDFAIR and FairMedFM do not vary corruption severity. Across 8 settings (2 datasets, 2 backbones, and 2 adaptation strategies) and 15 corruptions at five severities, I will measure when clean-fit calibration starts to do harm for each group and whether this depends on the adaptation strategy.
-  \item \textbf{An evaluation protocol for small groups.} In place of the usual binned calibration gap, cross-fitting, leave-one-family-out testing, proper scoring rules, and paired bootstrap intervals keep conclusions about groups with a few dozen cancers from being driven by noise.
+  \item \textbf{Contribution 1:} I propose a shift-aware calibrator that is fit for the worst-off group, while DAC and AAR are fit for average calibration. The fit is convex with two parameters, and no group labels are needed at test time. I also test a worst-group version of DAC, the seed method, and it does equally well, so the worst-group objective is what makes the difference.
+  \item \textbf{Contribution 2:} I measure subgroup calibration under corruption, since MEDFAIR and FairMedFM do not vary corruption severity. Using 8 settings (2 datasets, 2 backbones, and 2 adaptation strategies) and 15 corruptions at five severities, I look at when clean-fit calibration starts to do harm for the worst group and whether this depends on the adaptation strategy.
+  \item \textbf{Contribution 3:} I use an evaluation protocol meant for small groups. I do not rely on the usual binned calibration gap. I use cross-fitting, leave-one-family-out testing, proper scoring rules, and paired bootstrap intervals, so that conclusions about groups with a few dozen cancers depend less on noise.
 \end{itemize}
 
-Even if GR-SATS does not beat the baselines, the second and third contributions should still show when clean-fit calibration stops being safe for each group.
+GR-SATS lowers worst-group NLL against TS fit on corruptions, DAC, and AAR, with intervals that exclude zero. Most of the gain comes from noise corruptions and it costs some clean calibration, which Sections~\ref{sec:results} and~\ref{sec:discussion} look at in detail.
 
 %% =========================================================
 \section{Related Work}
@@ -178,7 +179,7 @@ This section condenses my Phase 1 survey. Starting from the two seed papers, DAC
   \label{fig:taxonomy}
 \end{figure}
 
-Figure~\ref{fig:taxonomy} sorts the methods by when calibration happens and by what a post-hoc calibrator can depend on. Train-time methods change the loss, add mixup, or use ensembles and dropout, and they all need retraining. Of these, only Cluster-Focal \cite{shui2023clusterfocal} aims at group calibration, and group-robust training can even make uncertainty estimates worse \cite{mehta2023evaluating}. Global post-hoc methods such as temperature scaling (TS) \cite{guo2017calibration} fit one small mapping on clean validation data. Shift-aware post-hoc methods expose the calibrator to perturbed or out-of-distribution (OOD) data \cite{tomani2021posthoc,roschewitz2025where}, learn from several source domains \cite{gong2021confidence,yu2022multidomain}, or let the temperature depend on feature density, as DAC does with nearest-neighbor distances and AAR does with atypicality \cite{tomani2023dac,yuksekgonul2023atypicality}. Group-aware post-hoc methods calibrate within known groups \cite{hebertjohnson2018multicalibration,shen2025calin} or within clusters of embeddings when group labels are missing \cite{salvador2022faircal,yang2023beyond}. Over time these strands stayed mostly separate. Shift-aware calibrators appeared from 2020 on, while fairness work moved to worst-group training \cite{sagawa2020groupdro}, and since 2025 the work has become more critical, with Roschewitz et al.\ finding that calibrators built for shift do not reliably beat simpler ones \cite{roschewitz2025where}. None of the papers DAC cites deals with patient groups, and none of the papers FairMedFM cites is a calibration method. Table~\ref{tab:literature} compares ten representative works.
+Figure~\ref{fig:taxonomy} sorts the methods by when calibration happens and by what a post-hoc calibrator can depend on. Train-time methods change the loss, add mixup, or use ensembles and dropout, and they all need retraining. Of these, only Cluster-Focal \cite{shui2023clusterfocal} aims at group calibration, and group-robust training can even make uncertainty estimates worse \cite{mehta2023evaluating}. Global post-hoc methods such as temperature scaling (TS) \cite{guo2017calibration} fit one small mapping on clean validation data. Shift-aware post-hoc methods expose the calibrator to perturbed or out-of-distribution (OOD) data \cite{tomani2021posthoc,roschewitz2025where}, learn from several source domains \cite{gong2021confidence,yu2022multidomain}, or let the temperature depend on feature density, as DAC does with nearest-neighbor distances and AAR does with atypicality \cite{tomani2023dac,yuksekgonul2023atypicality}. Group-aware post-hoc methods calibrate within known groups \cite{hebertjohnson2018multicalibration,shen2025calin} or within clusters of embeddings when group labels are missing \cite{salvador2022faircal,yang2023beyond}. For the most part these lines of work stayed separate. Shift-aware calibrators appeared from 2020 on, while fairness work moved to worst-group training \cite{sagawa2020groupdro}. More recent papers question some of this, for example Roschewitz et al.\ found that calibrators built for shift do not reliably beat simpler ones \cite{roschewitz2025where}. None of the papers DAC cites deals with patient groups, and none of the papers FairMedFM cites is a calibration method. Table~\ref{tab:literature} compares ten representative works.
 
 \begin{table*}[t]
   \caption{Comparison of representative related works. The two seed papers are in bold.}
@@ -215,13 +216,13 @@ Figure~\ref{fig:taxonomy} sorts the methods by when calibration happens and by w
 
 \subsection{Limitations of Existing Work}
 
-Table~\ref{tab:literature} shows the pattern behind this project. The papers that handle shift \cite{ovadia2019trust,tomani2021posthoc,tomani2023dac,roschewitz2025where,hekler2023tta} measure or improve only average calibration and report nothing by patient group. The papers that handle groups need retraining \cite{shui2023clusterfocal}, were built for a different task without shift \cite{salvador2022faircal}, or only audit existing models \cite{dominique2025calibration}. AAR comes closest, since it helped the worst skin-tone group without group labels, but it optimizes average NLL and was only tested on clean images \cite{yuksekgonul2023atypicality}. Studies of calibration in adapted or foundation models focus on CLIP and natural images \cite{tu2024empirical,oh2024calibrated,murugesan2024robust} or do not report groups \cite{hekler2025beyond,huang2026uncertainty,lin2026crsbench}, and Gupta et al.\ compared adapters by subgroup performance but not calibration \cite{gupta2026subgroup}. Finally, group calibration is usually summarized with a gap in binned expected calibration error (ECE), which is unreliable for small groups \cite{kumar2019verified,riccilara2023calibration}.
+Table~\ref{tab:literature} shows why I chose this problem. The papers that handle shift \cite{ovadia2019trust,tomani2021posthoc,tomani2023dac,roschewitz2025where,hekler2023tta} measure or improve only average calibration and report nothing by patient group. The papers that handle groups need retraining \cite{shui2023clusterfocal}, were built for a different task without shift \cite{salvador2022faircal}, or only audit existing models \cite{dominique2025calibration}. AAR comes closest, since it helped the worst skin-tone group without group labels, but it optimizes average NLL and was only tested on clean images \cite{yuksekgonul2023atypicality}. Studies of calibration in adapted or foundation models focus on CLIP and natural images \cite{tu2024empirical,oh2024calibrated,murugesan2024robust} or do not report groups \cite{hekler2025beyond,huang2026uncertainty,lin2026crsbench}, and Gupta et al.\ compared adapters by subgroup performance but not calibration \cite{gupta2026subgroup}. Another problem is that group calibration is usually summarized with a gap in binned expected calibration error (ECE), which is unreliable for small groups \cite{kumar2019verified,riccilara2023calibration}.
 
 %% =========================================================
 \section{Research Challenges and Motivation}
 \label{sec:challenges}
 
-These limitations point to three challenges. Each one is tied to a component of the method in Section~\ref{sec:method}, as summarized in Table~\ref{tab:mapping}.
+From these limitations I picked three challenges to work on. Table~\ref{tab:mapping} shows which part of the method in Section~\ref{sec:method} goes with each one.
 
 \subsection{Challenge 1: Protecting the Worst-Off Group Under Shift}
 \label{sec:ch1}
@@ -243,7 +244,7 @@ These limitations point to three challenges. Each one is tied to a component of 
 
 \textbf{Evidence from literature:} Tomani et al.'s fix assumes that the shift looks like Gaussian noise \cite{tomani2021posthoc}, DAC uses raw distances from many layers \cite{tomani2023dac}, and calibrators built for shift do not reliably beat simple ones under natural shift \cite{roschewitz2025where}. MedMNIST-C and CRS-Bench measure corruption robustness without looking at groups \cite{disalvo2024medmnistc,lin2026crsbench}, and FairMedFM compares adaptation strategies only on clean data \cite{jin2024fairmedfm}, even though fine-tuning can distort pretrained features \cite{kumar2022finetuning}.
 
-\textbf{Importance:} Nobody knows in advance which corruptions a deployed model will see, so a calibrator that only works on the corruptions it was fit on gives a false sense of safety.
+\textbf{Importance:} There is no way to know ahead of time which corruptions a deployed model will see, so a calibrator that only works on the corruptions it was fit on will look safer in testing than it really is.
 
 \textbf{Technical difficulty:} Raw distances have different scales for different backbones and adaptation strategies, and fine-tuning pulls training features closer together, so distances among training images understate how far a new clean image is. A percentile of clean distances tops out once corruption pushes an image past every clean image. A temperature that is linear in the score can extrapolate to a negative or huge value on a new corruption. The score is also confounded with group, because groups that are rare in training sit farther from the training data even on clean images.
 
@@ -252,13 +253,13 @@ These limitations point to three challenges. Each one is tied to a component of 
 \subsection{Challenge 3: Fitting and Evaluating Small Groups}
 \label{sec:ch3}
 
-\textbf{Problem:} The groups that matter most have very few positive cases, so both fitting a worst-group calibrator and judging whether it helps are noisy.
+\textbf{Problem:} The smallest groups have very few positive cases, which makes it hard to fit a worst-group calibrator and also hard to tell if it helped.
 
 \textbf{Evidence from literature:} In the Fitzpatrick17k-C splits \cite{abhishek2025quality}, skin types V and VI have 10 validation cancers and 22 test cancers. Binned ECE is biased when samples are few \cite{kumar2019verified,roelofs2022mitigating}, which can lead to wrong fairness conclusions \cite{riccilara2023calibration}, yet FairMedFM summarizes calibration fairness with a single ECE gap \cite{jin2024fairmedfm}.
 
-\textbf{Importance:} Without a careful protocol, a method could look better or worse for the darkest skin types purely by chance.
+\textbf{Importance:} With this few cases, a method could look better or worse for the darkest skin types just by chance.
 
-\textbf{Technical difficulty:} The bias of binned ECE depends on the number of samples and bins, so ECE values for groups of 362 and 1,794 images are not comparable. Fitting on the validation split alone leaves 10 cancers for the worst group. About 75 corrupted copies share one source image, so treating them as independent makes confidence intervals far too narrow, and testing every pair of more than ten methods over 8 settings invites false positives.
+\textbf{Technical difficulty:} The bias of binned ECE depends on the number of samples and bins, so ECE values for groups of 362 and 1,794 images are not comparable. Fitting on the validation split alone leaves only 10 cancers for skin types V and VI. About 75 corrupted copies share one source image, so treating them as independent makes confidence intervals far too narrow, and testing every pair of more than ten methods over 8 settings would likely give some false positives.
 
 \textbf{Connection to proposed method:} Cross-fitting over the pooled validation and test images (Section~\ref{sec:splits}) gives every fit and every test more cases. NLL and Brier score are the primary metrics, and three pre-specified comparisons are tested with a paired bootstrap over source images (Section~\ref{sec:metrics}).
 
@@ -331,7 +332,7 @@ where $m$ and $r$ are the mean and standard deviation of $\log d_k$ over the cle
   q_\theta(x) = \sigma\big(\beta_\theta(s(x))\, z(x)\big), \qquad \beta_\theta(s) = a_0 + a_1 s,
   \label{eq:calib}
 \end{equation}
-where $\sigma$ is the sigmoid and $\theta = (a_0, a_1)$ is in the set $\Theta$ where $\beta_\theta(s_{\min}) \geq \epsilon$ and $\beta_\theta(s_{\max}) \geq \epsilon$. Since $\beta_\theta$ is linear, these two constraints keep it positive on the whole clipped range, so the predicted class at the 0.5 threshold never changes, and $a_1 = 0$ gives ordinary TS. DAC instead makes the temperature itself linear in distances. Putting the linear model on the inverse temperature is what makes the worst-group fit convex, which is how this component serves Challenge 1. A temperature cannot fix risks that are too high or too low across the board, which the base-rate gaps in Section~\ref{sec:data} make likely, so I also test a bias variant, $\sigma(\beta_\theta(s)\, z + b_0 + b_1 s)$. Its fit is still convex, but it can change predictions, so I report the area under the ROC curve (AUC) and accuracy for it and pick the main version at the go/no-go point (Section~\ref{sec:gonogo}).
+where $\sigma$ is the sigmoid and $\theta = (a_0, a_1)$ is in the set $\Theta$ where $\beta_\theta(s_{\min}) \geq \epsilon$ and $\beta_\theta(s_{\max}) \geq \epsilon$. Since $\beta_\theta$ is linear, these two constraints keep it positive on the whole clipped range, so the predicted class at the 0.5 threshold never changes, and $a_1 = 0$ gives ordinary TS. DAC instead makes the temperature itself linear in distances. Putting the linear model on the inverse temperature is what makes the worst-group fit convex, which is how this component serves Challenge 1. A temperature cannot fix risks that are too high or too low across the board, which the base-rate gaps in Section~\ref{sec:data} make likely, so I also test a bias variant, $\sigma(\beta_\theta(s)\, z + b_0 + b_1 s)$. Its fit is still convex, but it can change predictions, so I report the area under the ROC curve (AUC) and accuracy for it and pick the main version from the results.
 
 \textbf{C3. Worst-group objective.} Let $D_{g,\ell}$ be the fitting images of group $g$ at severity $\ell$, where severities 1 to 5 use only the training corruption families. The loss of group $g$ and the fit are
 \begin{equation}
@@ -342,11 +343,11 @@ where $\sigma$ is the sigmoid and $\theta = (a_0, a_1)$ is in the set $\Theta$ w
   \hat{\theta} = \arg\min_{\theta \in \Theta}\ \max_{g \in \mathcal{G}}\ L_g(\theta),
   \label{eq:objective}
 \end{equation}
-with $q_\theta(1 \mid x) = q_\theta(x)$ and $q_\theta(0 \mid x) = 1 - q_\theta(x)$, as in GroupDRO \cite{sagawa2020groupdro}. Each $L_g$ averages logistic losses of $\beta_\theta(s)\, z$, which is linear in $\theta$, so each $L_g$ and their maximum are convex and $\Theta$ is set by linear constraints. I therefore solve Eq.~\eqref{eq:objective} exactly in epigraph form, minimizing $t$ subject to $L_g(\theta) \leq t$ for every group. The factor $1/6$ gives clean images and each severity the same weight, so the 55 to 65 corrupted copies of each image do not swamp the clean one. Raw NLL also reflects how hard a group is to classify, so a second version minimizes the excess loss $L_g(\theta) - \min_{\theta' \in \Theta} L_g(\theta')$. This component addresses Challenge 1, and it is what separates GR-SATS from DAC and AAR, which are both fit for average calibration.
+with $q_\theta(1 \mid x) = q_\theta(x)$ and $q_\theta(0 \mid x) = 1 - q_\theta(x)$, as in GroupDRO \cite{sagawa2020groupdro}. Each $L_g$ averages logistic losses of $\beta_\theta(s)\, z$, which is linear in $\theta$, so each $L_g$ and their maximum are convex and $\Theta$ is set by linear constraints. I therefore solve Eq.~\eqref{eq:objective} in epigraph form with SciPy's SLSQP solver, minimizing $t$ subject to $L_g(\theta) \leq t$ for every group. The factor $1/6$ gives clean images and each severity the same weight, so the 55 to 65 corrupted copies of each image do not outweigh the clean one. Raw NLL also reflects how hard a group is to classify, so a second version minimizes the excess loss $L_g(\theta) - \min_{\theta' \in \Theta} L_g(\theta')$. This component addresses Challenge 1, and it is what separates GR-SATS from DAC and AAR, which are both fit for average calibration.
 
-\textbf{C4. DAC fit for the worst group.} The approved idea was to change DAC so that it targets the worst group, so I also test this literal version, which I call DAC-WG. It keeps DAC's temperature $S_w(x) = w_0 + \sum_l w_l\, d_k^{(l)}(x)$, a weighted sum of $k$-NN distances with positive weights over the layers DAC uses for ViT-Base. DAC fits $w$ by minimizing the average squared error (the Brier score) on the validation set, and DAC-WG fits it with Eq.~\eqref{eq:objective} instead. This loss is not convex in $w$, so I use GroupDRO's alternating gradient and exponentiated-gradient updates \cite{sagawa2020groupdro}. Comparing DAC with DAC-WG shows the effect of the objective, and comparing DAC-WG with GR-SATS isolates the parameterization.
+\textbf{C4. DAC fit for the worst group.} The approved idea was to change DAC so that it targets the worst group, so I also test this literal version, which I call DAC-WG. It keeps DAC's temperature, which is a weighted sum of $k$-NN distances with positive weights, but with the final layer only, so $S_w(x) = w_0 + w_1\, d_k(x)^2$ (the official code also uses squared distances). DAC fits $w$ by minimizing the average squared error (the Brier score) on the validation set, and DAC-WG fits it with Eq.~\eqref{eq:objective} instead. This loss is not convex in $w$. I fit it in the same epigraph form with SLSQP, starting once from DAC's own starting point and once from the average-NLL fit, and keep the better result, so DAC-WG is a local optimum. Comparing DAC with DAC-WG shows the effect of the objective, and comparing DAC-WG with GR-SATS shows the effect of the parameterization.
 
-\textbf{Why this design.} The worst group in Fitzpatrick17k has a few dozen cancers even after pooling, so a calibrator with many parameters would likely overfit it. Retraining methods such as GroupDRO or Cluster-Focal would need a new model for every attribute and adaptation strategy, while a post-hoc calibrator runs on saved outputs in seconds. Group-wise TS needs group labels at test time, which are often missing or sensitive, so I only use it as a reference.
+I kept the calibrator this small because the smallest group in Fitzpatrick17k has only 32 cancers even after pooling, so a calibrator with many parameters would likely overfit it. Retraining methods such as GroupDRO or Cluster-Focal would need a new model for every attribute and adaptation strategy, while a post-hoc calibrator runs on saved outputs in seconds. Group-wise TS needs group labels at test time, which are often missing or sensitive, so I only use it as a reference.
 
 \begin{table}[t]
   \caption{Mapping between research challenges and proposed methods.}
@@ -356,13 +357,13 @@ with $q_\theta(1 \mid x) = q_\theta(x)$ and $q_\theta(0 \mid x) = 1 - q_\theta(x
   \renewcommand{\arraystretch}{1.1}
   \begin{tabularx}{\columnwidth}{@{}P{1.3cm}LLL@{}}
     \toprule
-    \textbf{Challenge} & \textbf{Technique} & \textbf{Function} & \textbf{Expected effect} \\
+    \textbf{Challenge} & \textbf{Technique} & \textbf{Function} & \textbf{Observed effect} \\
     \midrule
-    1. Worst-off group under shift & Worst-group fit (C3) of an inverse temperature linear in the shift score (C2) & Picks the two parameters that minimize the largest group loss, as a convex problem & Lower worst-group NLL and Brier score under corruption \\
+    1. Worst-off group under shift & Worst-group fit (C3) of an inverse temperature linear in the shift score (C2) & Picks the two parameters that minimize the largest group loss, as a convex problem & Lower worst-group NLL and Brier score than all three primary comparisons, with a cost to the best-off group on HAM10000 \\
     \addlinespace
-    2. Shift signal that transfers & Standardized, clipped log $k$-NN distance (C1), leave-one-family-out testing & Gives a unitless score that grows with severity and stays in the fitted range & Calibration that holds on unseen corruption families, for LP and LoRA \\
+    2. Shift signal that transfers & Standardized, clipped log $k$-NN distance (C1), leave-one-family-out testing & Gives a unitless score that grows with severity and stays in the fitted range & Large gains on unseen noise, small ones on the other families and for LoRA \\
     \addlinespace
-    3. Small groups & Cross-fitting, proper scores, paired bootstrap over source images & Uses every pooled image for testing and gives honest uncertainty & Conclusions about small groups that are not driven by noise \\
+    3. Small groups & Cross-fitting, proper scores, paired bootstrap over source images & Uses every pooled image for testing and gives intervals that are not too narrow & Intervals that exclude zero for the primary comparisons, while skin types V-VI stay uncertain \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -378,7 +379,7 @@ I use two public image datasets with binary malignancy labels and patient group 
 
 Following MEDFAIR, I drop images whose group attribute was not recorded (67 in HAM10000 and 296 in Fitzpatrick17k-C), which leaves no missing values and gives HAM10000 the same 9,948 images that MEDFAIR and FairMedFM use \cite{zong2023medfair,jin2024fairmedfm}. Table~\ref{tab:data} gives the counts. Two features of the data matter for calibration. In HAM10000, lesions with several photos ended up almost entirely in the training split (1,876 of 1,956) and are more often malignant, so 21.3\% of training images are malignant compared with 11.9\% of the pooled validation and test images. In Fitzpatrick17k-C, 8.8\% of the pooled V-VI images are malignant compared with 16.0\% of the I-II images.
 
-For shift I use the 15 dermatology corruptions of MedMNIST-C \cite{disalvo2024medmnistc} at five severities.\footnote{\url{https://github.com/francescodisalvo05/medmnistc-api}} They fall into five families, digital (JPEG and pixelate), noise (Gaussian, speckle, impulse, and shot), blur (defocus, motion, and zoom), color (brightness and contrast, each up and down), and task-specific (black corners and text overlays). The task-specific family imitates dermoscope artifacts, so for Fitzpatrick17k's clinical photos I report it separately.
+For shift I use the 15 dermatology corruptions of MedMNIST-C \cite{disalvo2024medmnistc} at five severities.\footnote{\url{https://github.com/francescodisalvo05/medmnistc-api}} They fall into five families, digital (JPEG and pixelate), noise (Gaussian, speckle, impulse, and shot), blur (defocus, motion, and zoom), color (brightness and contrast, each up and down), and task-specific (black corners and text overlays). The task-specific family imitates dermoscope artifacts, so for Fitzpatrick17k's clinical photos I report it separately. I kept the official settings, in which black corners have strengths 1.10, 1.05, 1.00, 0.90, and 0.95 from severity 1 to 5, so level 4 is stronger than level 5.
 
 \begin{table}[t]
   \caption{Data after removing images with an unrecorded group attribute. Each entry is the number of images, with malignant cases in parentheses. The pool is the validation and test splits together, used through 5-fold cross-fitting.}
@@ -418,121 +419,213 @@ Models are trained on the official training split, with 10\% held out (grouped b
 \label{sec:baselines}
 
 \begin{itemize}
-  \item \textbf{Baseline 1, simple global calibrators.} No calibration, TS fit on clean images \cite{guo2017calibration}, TS fit on images perturbed with Gaussian noise \cite{tomani2021posthoc}, TS fit on clean images plus my training corruption families, and TS with exposure to unrelated texture images, which Roschewitz et al.\ found most robust under natural shift \cite{roschewitz2025where}.
-  \item \textbf{Baseline 2, shift-aware calibrators.} DAC \cite{tomani2023dac}, multi-domain TS \cite{yu2022multidomain}, and AAR \cite{yuksekgonul2023atypicality}, all fit on the same clean and corrupted images as my method.
-  \item \textbf{Baseline 3, group-aware calibrators.} Cluster-wise TS in the style of FairCal \cite{salvador2022faircal}, which fits one temperature per k-means cluster and needs no test-time group labels. Group-wise TS and a per-group version of GR-SATS use test-time group labels, so they serve only as oracles.
+  \item \textbf{Baseline 1, simple global calibrators.} No calibration, TS fit on clean images \cite{guo2017calibration}, TS fit on clean images plus Gaussian noise \cite{tomani2021posthoc}, and TS fit on clean images plus my training corruption families. The Gaussian noise is MedMNIST-C's at all five severities, so this baseline has seen the noise family, and I also report results without that family.
+  \item \textbf{Baseline 2, shift-aware calibrators.} DAC \cite{tomani2023dac} with the final layer only, multi-domain TS \cite{yu2022multidomain}, and AAR \cite{yuksekgonul2023atypicality}, all fit on the same clean and corrupted images as my method. Multi-domain TS fits a temperature for each corruption and severity and predicts it from the features by least squares, and I clip the prediction to the range of the fitted temperatures.
+  \item \textbf{Baseline 3, group-aware calibrators.} Cluster-wise TS in the style of FairCal \cite{salvador2022faircal}, which fits one temperature per k-means cluster and needs no test-time group labels. Group-wise TS and a per-group version of GR-SATS fit one calibrator for each group cell (sex by age on HAM10000, skin type on Fitzpatrick17k) and use test-time group labels, so they serve only as oracles.
 \end{itemize}
 
 TS with my corruption families is the strongest simple baseline. DAC is the seed method and AAR is the closest existing method, so these three are the primary comparisons.
 
 \subsection{Implementation Details}
 
-I will write the code in Python with PyTorch. The backbones are DINOv2 ViT-B/14 \cite{oquab2024dinov2}, which is self-supervised on 142 million natural images, and the ViT-B/16 image encoder of BiomedCLIP \cite{zhang2025biomedclip}, a CLIP-style model \cite{radford2021clip} trained on 15 million biomedical figure and caption pairs. Both are ViT-Base models \cite{dosovitskiy2021vit} in FairMedFM, so pretraining is the main difference between them. LP is an L2-regularized logistic regression on the frozen embedding, with each feature standardized using the training images and the strength chosen from $\{0.01, 0.1, \dots, 1000\}$ by development-slice NLL. LoRA \cite{hu2022lora} adds rank-8 adapters with scaling 16 to the query and value projections, plus a linear head, trained with unweighted binary cross-entropy and AdamW (learning rate $3 \times 10^{-4}$, weight decay 0.01, batch size 64, cosine schedule) for at most 20 epochs, keeping the epoch with the lowest development-slice NLL. Nearest neighbors come from FAISS with $k = 10$, GR-SATS is solved with CVXPY with $\epsilon = 0.05$, cluster-wise TS uses 8 clusters, and DAC and AAR use their official code.\footnote{\url{https://github.com/futakw/DensityAwareCalibration} and \url{https://github.com/mertyg/beyond-confidence-atypicality}} Training runs on free Google Colab T4 GPUs with mixed precision, with Kaggle as a backup. Jobs checkpoint to Google Drive so they survive disconnects, and each corrupted batch is generated once and passed through every model of the same dataset, since the two CPU cores are the bottleneck. The calibrators only need saved logits and distances, so they fit on a CPU in seconds to minutes. I estimate the core grid at 10 to 20 T4 hours.
+The code is in Python with PyTorch, and most of it was written with Claude (Section~\ref{sec:llm}). The backbones are DINOv2 ViT-B/14 \cite{oquab2024dinov2}, which is self-supervised on 142 million natural images, and the ViT-B/16 image encoder of BiomedCLIP \cite{zhang2025biomedclip}, a CLIP-style model \cite{radford2021clip} trained on 15 million biomedical figure and caption pairs. Both are ViT-Base models \cite{dosovitskiy2021vit} in FairMedFM, so pretraining is the main difference between them. LP is an L2-regularized logistic regression on the frozen embedding, with each feature standardized using the training images and the strength chosen from $\{0.01, 0.1, \dots, 1000\}$ by development-slice NLL. LoRA \cite{hu2022lora} adds rank-8 adapters with scaling 16 to the query and value projections, plus a linear head, trained with unweighted binary cross-entropy and AdamW (learning rate $3 \times 10^{-4}$, weight decay 0.01, batch size 64, cosine schedule) for at most 20 epochs, stopping after 5 epochs without a lower development-slice NLL and keeping the epoch where it was lowest. Nearest neighbors are exact, computed in PyTorch with $k = 10$. GR-SATS is solved with SciPy's SLSQP with $\epsilon = 0.05$, and a one-parameter temperature fit falls back to a one-dimensional search if SLSQP fails. Cluster-wise TS uses 8 k-means clusters fit on 20,000 random fitting rows of normalized features. DAC is reimplemented from its paper and official code\footnote{\url{https://github.com/futakw/DensityAwareCalibration}} and AAR from its paper. For DAC I require a temperature of at least 0.001 as a constraint, where the official code clips it. Training ran on free Google Colab T4 GPUs with mixed precision. Jobs checkpoint to Google Drive so they survive disconnects, and each corrupted batch is generated once and passed through every model of the same dataset, since the two CPU cores are the bottleneck. The calibrators only need saved logits and distances, so they fit on a CPU in seconds to minutes. Training the 12 LoRA models took about 2.4 T4 hours in total.
 
 \subsection{Evaluation Metrics}
 \label{sec:metrics}
 
-\textbf{Primary metrics.} The main test pools the held-out corruption families at severities 3 to 5, where calibration is most likely to fail, and leaves out the task-specific family for Fitzpatrick17k. On this pool I report worst-group NLL and worst-group Brier score, taking the worst group over all four HAM10000 groups and also per attribute. Both are proper scoring rules \cite{brier1950verification,gruber2022proper}, so a method cannot improve them without better probabilities. Unlike binned ECE, they need no bins and are not biased upward in small groups \cite{kumar2019verified,roelofs2022mitigating}.
+The main test pools the held-out corruption families at severities 3 to 5, where calibration is most likely to fail, and leaves out the task-specific family for Fitzpatrick17k. My primary metrics on this pool are worst-group NLL and worst-group Brier score, taking the worst group over all four HAM10000 groups and also per attribute. Both are proper scoring rules \cite{brier1950verification,gruber2022proper}, so a method cannot improve them without better probabilities. Unlike binned ECE, they need no bins and are not biased upward in small groups \cite{kumar2019verified,roelofs2022mitigating}.
 
-\textbf{Secondary metrics.} Per-group NLL and Brier score show whether a method narrows the gap by making the better-off groups worse \cite{zong2023medfair}, and average NLL shows what the worst-group fit costs. ECE uses 15 equal-mass bins \cite{roelofs2022mitigating} alongside the debiased estimator of Kumar et al.\ \cite{kumar2019verified}. I also report the ECE gap between groups, AUC, since a per-image temperature can reorder images, and accuracy for methods that can change predictions. On clean images, ECE and AUC measure the in-distribution cost that Roschewitz et al.\ warn about \cite{roschewitz2025where}.
+I also use several secondary metrics. Per-group NLL and Brier score show whether a method narrows the gap by making the better-off groups worse \cite{zong2023medfair}, and average NLL shows what the worst-group fit costs. ECE uses 15 equal-mass bins \cite{roelofs2022mitigating} alongside the debiased estimator of Kumar et al.\ \cite{kumar2019verified}. I also report the ECE gap between groups, AUC, since a per-image temperature can reorder images, and accuracy for methods that can change predictions. On clean images, ECE and AUC measure the in-distribution cost that Roschewitz et al.\ warn about \cite{roschewitz2025where}.
 
-\textbf{Statistics.} GR-SATS succeeds against a primary comparison if it has lower worst-group NLL and Brier score averaged over the 8 settings, with a 95\% paired bootstrap interval that excludes zero. The bootstrap resamples source images 2,000 times (lesions for HAM10000), since the corrupted copies of one image are not independent. I also expect GR-SATS to close at least half of the worst-group NLL gap to the per-group oracle and to stay within 0.01 ECE and 1 AUC point of clean TS on clean images. To rank all methods across settings without dozens of pairwise tests, I use the Friedman test with the Nemenyi post-hoc test, as MEDFAIR does \cite{zong2023medfair}.
+I count GR-SATS as successful against a primary comparison if it has lower worst-group NLL and Brier score averaged over the 8 settings, with a 95\% paired bootstrap interval that excludes zero. The bootstrap resamples source images 2,000 times (lesions for HAM10000), since the corrupted copies of one image are not independent. I also set three secondary criteria before running the experiments. GR-SATS should close at least half of the worst-group NLL gap to the per-group oracle, and it should stay within 0.01 ECE and within 1 AUC point of clean TS on clean images. To rank all methods across settings without dozens of pairwise tests, I use the Friedman test with the Nemenyi post-hoc test, as MEDFAIR does \cite{zong2023medfair}.
 
 %% =========================================================
+%% Every table in this section comes from code/make_tables.py and every plot
+%% from its matplotlib functions. Both read the CSV files in code/results/.
 \section{Results and Analysis}
 \label{sec:results}
 
-No experiments have been run yet, so every entry below is to be determined (TBD).
+I ran all 8 settings with three seeds. Unless I say otherwise, numbers are means over the seeds on the main test pool, which is the held-out corruption families at severities 3 to 5. Without any calibration, the models reach a clean AUC of 0.959 (DINOv2) and 0.952 (BiomedCLIP) with LP and 0.977 and 0.971 with LoRA on HAM10000, and 0.912 and 0.898 with LP and 0.930 and 0.917 with LoRA on Fitzpatrick17k. The pilot of Section~\ref{sec:gonogo} passed on the HAM10000 linear probes. The worst-group fit lowered worst-group NLL by 0.021 to 0.027 compared with the average fit, with bootstrap standard errors of 0.005 to 0.007, so I went on with the full grid. The worst group is the same in every run, age 60 or older on HAM10000 and skin types I-II on Fitzpatrick17k.
+
+I tested three hypotheses. The first (H1) is that the worst-group NLL of clean-fit TS rises with severity, and faster for the worst group than for the best one. The second (H2) is that the severity where clean-fit TS starts doing harm, meaning it has a higher worst-group NLL than no calibration, is different for LP and LoRA. The third (H3) is that GR-SATS meets the success criteria of Section~\ref{sec:metrics} against all three primary comparisons.
 
 \subsection{Main Results}
 
-\begin{table}[t]
-  \caption{Planned main results on unseen corruption families at severities 3 to 5, averaged over the 8 settings. WG means worst group, and $\dagger$ marks oracles that use group labels at test time.}
+\begin{table*}[t]
+  \caption{Main results on held-out corruption families at severities 3 to 5, averaged over the 8 settings and three seeds. WG means worst group. The no-noise column leaves the noise family out of the test pool. Rank is the mean rank by WG NLL over the 8 settings. The best value among methods that do not see test-time group labels is bold, and $\dagger$ marks oracles that do see them.}
   \label{tab:results}
+  \footnotesize
+  \centering
+  \input{tables/results}
+\end{table*}
+
+\begin{table}[t]
+  \caption{Success test. Differences are averaged over the 8 settings, and negative means GR-SATS is better. Intervals are 95\% paired bootstrap intervals over source images (lesions on HAM10000).}
+  \label{tab:success}
   \scriptsize
-  \setlength{\tabcolsep}{3.5pt}
-  \begin{tabular}{@{}lccccc@{}}
-    \toprule
-    \textbf{Method} & \textbf{WG NLL} & \textbf{WG Brier} & \textbf{NLL} & \textbf{Clean ECE} & \textbf{AUC} \\
-    \midrule
-    No calibration & TBD & TBD & TBD & TBD & TBD \\
-    TS, clean & TBD & TBD & TBD & TBD & TBD \\
-    TS with Gaussian noise & TBD & TBD & TBD & TBD & TBD \\
-    TS with corruptions & TBD & TBD & TBD & TBD & TBD \\
-    TS with textures & TBD & TBD & TBD & TBD & TBD \\
-    DAC & TBD & TBD & TBD & TBD & TBD \\
-    Multi-domain TS & TBD & TBD & TBD & TBD & TBD \\
-    AAR & TBD & TBD & TBD & TBD & TBD \\
-    Cluster-wise TS & TBD & TBD & TBD & TBD & TBD \\
-    GR-SATS (proposed) & TBD & TBD & TBD & TBD & TBD \\
-    \midrule
-    Group-wise TS$^\dagger$ & TBD & TBD & TBD & TBD & TBD \\
-    Per-group GR-SATS$^\dagger$ & TBD & TBD & TBD & TBD & TBD \\
-    \bottomrule
-  \end{tabular}
+  \setlength{\tabcolsep}{3pt}
+  \centering
+  \input{tables/success}
 \end{table}
 
-Table~\ref{tab:results} will hold the main comparison. I will test three hypotheses. \textbf{H1.} The worst-group NLL of clean-fit TS rises with severity, and faster for the worst group than for the best one. \textbf{H2.} The severity at which clean-fit TS starts doing harm, meaning a higher worst-group NLL than no calibration, differs between LP and LoRA. \textbf{H3.} GR-SATS meets the success criteria of Section~\ref{sec:metrics} against all three primary comparisons. H1 and H2 are measurements, so they are worth reporting whatever happens with H3.
+\begin{table*}[t]
+  \caption{Worst-group NLL in each of the 8 settings, same test pool as Table~\ref{tab:results}. TS with Gaussian noise has seen the noise family, which is part of this pool.}
+  \label{tab:settings}
+  \footnotesize
+  \centering
+  \input{tables/settings}
+\end{table*}
+
+I start with H3, since it is the main test of the method. GR-SATS has the lowest worst-group NLL (0.398) and worst-group Brier score (0.123) in Table~\ref{tab:results}, and the best mean rank (1.75). Table~\ref{tab:success} shows the pre-specified test. GR-SATS lowers worst-group NLL by 0.044 against TS with corruptions, 0.013 against DAC, and 0.022 against AAR, and all six intervals exclude zero, so it passes the success criterion against all three primary comparisons. Testing each setting and seed separately gives 24 intervals per comparison. GR-SATS wins all 24 against TS with corruptions, wins 22 against DAC with one tie and one loss, and wins 18 against AAR with five ties and one loss. Both losses are on one HAM10000 BiomedCLIP LoRA seed.
+
+The rank tests give weaker evidence. The Friedman test rejects the hypothesis that the nine methods are equal ($\chi^2 = 53.2$, $p < 10^{-7}$), but the Nemenyi critical difference with only 8 settings is 4.25. So GR-SATS is significantly better than TS with corruptions, no calibration, and clean TS, but I cannot say that for DAC, AAR, multi-domain TS, cluster-wise TS, or TS with Gaussian noise (Figure~\ref{fig:cd}).
+
+GR-SATS is also not the best method in every setting. Table~\ref{tab:settings} shows that it is best or tied for best in four of the 8 settings, and TS with Gaussian noise is best in the other four. That baseline is fit on MedMNIST-C's Gaussian noise at all five severities, so it has seen the noise family that the other methods have to extrapolate to. With the noise family left out of the test pool, GR-SATS has a worst-group NLL of 0.354 and TS with Gaussian noise has 0.365, and GR-SATS is better in 6 of 8 settings. TS with Gaussian noise also has the worst clean ECE in the table (0.073), because it softens clean images as much as noisy ones.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/cd}
+  \caption{Mean rank of each method by worst-group NLL over the 8 settings. Methods joined by a bar are not significantly different under the Nemenyi test.}
+  \Description{A critical difference diagram. GR-SATS has the best mean rank, 1.75, followed by TS with Gaussian noise at 2.00, DAC at 3.38, AAR at 4.00, cluster-wise TS at 4.88, multi-domain TS at 5.88, TS with corruptions at 6.12, no calibration at 8.25, and clean TS at 8.75. The critical difference is 4.25.}
+  \label{fig:cd}
+\end{figure}
+
+For the three secondary criteria, two hold and one fails. GR-SATS closes at least 96\% of the worst-group NLL gap to the per-group oracle for every primary comparison in every setting, where I asked for half. Its clean AUC is never more than 0.4 points below clean TS, where I allowed 1 point. The one that fails is clean ECE. The clean ECE of GR-SATS is 0.028 on average against 0.013 for clean TS, and it is within 0.01 of clean TS in only 2 of 8 settings. The worst case is HAM10000 with the DINOv2 probe, at 0.041 against 0.012. On clean images the worst-group NLL is also about 0.010 higher than no calibration on HAM10000. The AUC of the global TS rows differs slightly from the uncalibrated row only because each fold and held-out family has its own temperature.
+
+\subsection{Clean-Fit Calibration Under Corruption}
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\textwidth]{figures/severity}
+  \caption{Worst-group NLL against corruption severity in each setting, on held-out families. Dashed lines use no corrupted images.}
+  \Description{Eight line plots, one for each combination of dataset, adaptation, and backbone, with severity from 0 to 5 on the horizontal axis and worst-group NLL on the vertical axis. Every curve rises with severity. On HAM10000 clean-fit TS is the highest curve. On Fitzpatrick17k with LoRA no calibration is the highest curve. GR-SATS is lowest or close to lowest from severity 2 on.}
+  \label{fig:severity}
+\end{figure*}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/groups}
+  \caption{NLL of each group under clean-fit TS, averaged over the four settings of each dataset.}
+  \Description{Two line plots of NLL against severity. On HAM10000 the 60 or older group rises from 0.29 to 0.64, far above male, female, and under 60. On Fitzpatrick17k skin types I-II are highest, then III-IV, then V-VI.}
+  \label{fig:groups}
+\end{figure}
+
+For H1, Figure~\ref{fig:groups} shows the NLL of each group under clean-fit TS. From clean images to severity 5, the NLL of patients 60 or older rises from 0.287 to 0.639 and that of patients under 60 from 0.082 to 0.167. On Fitzpatrick17k it rises from 0.253 to 0.464 for skin types I-II and from 0.162 to 0.275 for V-VI. The worst group has the largest rise in all 8 settings, so H1 holds in absolute terms. In relative terms the difference is small. The NLL of both age groups roughly doubles (2.2 times against 2.0 times), so part of the growing gap is that a group that starts with a higher loss also gains more.
+
+H2 holds on Fitzpatrick17k but not on HAM10000. On HAM10000, clean-fit TS is worse than no calibration from severity 0 or 1 on in all four settings, for LP and LoRA alike, and by severity 5 the difference in worst-group NLL is 0.033 to 0.089 (Figure~\ref{fig:severity}). On Fitzpatrick17k, clean-fit TS changes almost nothing for the probes (at most 0.012 worse), and for LoRA it never does harm and lowers worst-group NLL by 0.049 to 0.072 at severity 5. The reason is the direction of the clean miscalibration. The HAM10000 models are underconfident on clean images, so clean-fit TS sharpens the predictions, which is the wrong direction once the images are corrupted. The Fitzpatrick17k LoRA models are already overconfident on clean images, so clean-fit TS softens them, which happens to help under corruption too.
 
 \subsection{Ablation Study}
 
 \begin{table}[t]
-  \caption{Planned ablation on the same test pool. The first four rows cross a global or shift-aware temperature with an average or worst-group loss.}
+  \caption{Ablation on the same test pool. The first four rows cross a global or shift-aware temperature with an average or worst-group loss. HAM and Fitz are WG NLL by dataset.}
   \label{tab:ablation}
   \scriptsize
-  \begin{tabular}{@{}llcc@{}}
-    \toprule
-    \textbf{Temperature} & \textbf{Loss} & \textbf{WG NLL} & \textbf{NLL} \\
-    \midrule
-    Global & Average (TS with corruptions) & TBD & TBD \\
-    Global & Worst group & TBD & TBD \\
-    Shift-aware & Average & TBD & TBD \\
-    Shift-aware & Worst group (GR-SATS) & TBD & TBD \\
-    \midrule
-    \multicolumn{2}{@{}l}{GR-SATS with excess NLL} & TBD & TBD \\
-    \multicolumn{2}{@{}l}{GR-SATS with bias term} & TBD & TBD \\
-    \multicolumn{2}{@{}l}{DAC, average squared error} & TBD & TBD \\
-    \multicolumn{2}{@{}l}{DAC-WG, worst-group NLL} & TBD & TBD \\
-    \bottomrule
-  \end{tabular}
+  \setlength{\tabcolsep}{2pt}
+  \centering
+  \input{tables/ablation}
 \end{table}
 
-If the shift-aware, worst-group cell of Table~\ref{tab:ablation} beats both cells that change only one part, then both parts matter. If the worst-group loss also helps DAC, the gain comes from the objective and not from my shift score. I will also check sensitivity to $k \in \{1, 10, 50\}$.
+The first four rows of Table~\ref{tab:ablation} separate the two parts of GR-SATS. Changing only the loss lowers worst-group NLL from 0.442 to 0.423, changing only the temperature lowers it to 0.412, and changing both gives 0.398. Both parts help on average, but not in the same settings. On the HAM10000 probes, removing the shift-aware temperature costs 0.027 and 0.032 (DINOv2 and BiomedCLIP) and removing the worst-group loss costs 0.026 and 0.019. On HAM10000 LoRA only the loss matters, with 0.023 and 0.026 for the loss and at most 0.002 for the shift score. On Fitzpatrick17k the shift score does most of the work. Removing it costs 0.029 and 0.067 for LP and 0.004 and 0.039 for LoRA, while removing the worst-group loss costs 0.002 to 0.010.
+
+The worst-group loss helps DAC as much as it helps my calibrator. DAC-WG reaches 0.397 and GR-SATS 0.398, which is a tie, and DAC fit for average NLL instead of squared error stays at 0.411. So the gain over DAC comes from the objective and not from my parameterization. The advantage of the linear inverse temperature is that the fit is convex, so a local optimum is also the global one, while DAC-WG is a local optimum found from two starting points.
+
+None of the other variants gave me a reason to change the main method. The bias variant has the same worst-group NLL (0.398) but lowers accuracy on the test pool from 0.891 to 0.887 on average, and from 0.896 to 0.876 on HAM10000 with the DINOv2 probe, so I kept GR-SATS without bias. The excess-NLL variant has a much better clean ECE (0.018) but gives up almost all of the gain from the group loss (0.413). Using $k = 1$ or $k = 50$, or a reference bank with equal numbers from each group, changes worst-group NLL by at most 0.001 on average.
 
 \subsection{Error and Failure Analysis}
 \label{sec:failure}
 
-Per-group reliability diagrams at each severity will show whether errors come from overconfidence, which a temperature can fix, or from risks that are off in one direction, which needs the bias variant. Per-family results will show which corruptions break the calibrator, for example whether brightness and contrast changes hurt darker skin types more. To tell whether a group has high shift scores because of corruption or just because it is rare in training, I will check whether the gap in scores between groups grows beyond its clean value and rerun the method with a reference bank that has equal numbers from each group.
+\begin{table}[t]
+  \caption{Worst-group NLL at severities 3 to 5 by held-out family, averaged over the four settings of each dataset. TS-C is TS with corruptions and GR is GR-SATS. $^*$The task-specific family is not in the main pool for Fitzpatrick17k.}
+  \label{tab:families}
+  \scriptsize
+  \setlength{\tabcolsep}{2.5pt}
+  \centering
+  \input{tables/families}
+\end{table}
+
+I first looked at each corruption family by itself, and most of the gain comes from noise (Table~\ref{tab:families}). When noise is held out, GR-SATS lowers worst-group NLL from 0.728 to 0.572 on HAM10000 and from 0.555 to 0.447 on Fitzpatrick17k compared with TS with corruptions. Digital corruptions on HAM10000 also improve clearly, from 0.483 to 0.423. On the other families the differences are small, and TS with corruptions is the best of the four on color and task-specific corruptions on HAM10000 and on digital corruptions on Fitzpatrick17k. Leaving noise out of the pool, the gain of GR-SATS over TS with corruptions drops from 0.044 to 0.009, and in three of the four LoRA settings the two are within 0.002 of each other. On Fitzpatrick17k's task-specific corruptions, no calibration (0.285) is better than GR-SATS (0.299).
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/reliability}
+  \caption{Reliability of the worst group at severities 3 to 5, in 15 equal-mass bins averaged over the four settings and three seeds of each dataset. Colors match Figure~\ref{fig:severity}.}
+  \Description{Two reliability diagrams. On HAM10000, group 60 or older, every method without the worst-group loss lies above the diagonal for predicted risks under 0.5, and GR-SATS is closest to the diagonal. On Fitzpatrick17k, group I-II, no calibration lies above the diagonal and the other methods are close to it.}
+  \label{fig:reliability}
+\end{figure}
+
+Under corruption the uncalibrated models underestimate the risk of the worst groups. For patients 60 or older at severities 3 to 5 the mean predicted risk is 17.1\%, while 26.0\% of the lesions are malignant, and Figure~\ref{fig:reliability} shows the same thing bin by bin. GR-SATS raises the mean to 22.3\% and is closest to the diagonal. For skin types I-II it raises the mean from 9.3\% to 14.3\%, against a true rate of 16.0\%. The downside is that risks become too high for the groups with low cancer rates. For patients under 60 the mean predicted risk rises from 5.9\% to 11.4\% when only 5.1\% of the lesions are malignant, and for skin types V-VI it rises from 6.8\% to 12.1\% against 8.8\%. A temperature pulls every risk toward 0.5, so it cannot raise the risk of one group without raising that of another group with similar scores.
+
+The per-group results show the same cost. On HAM10000, GR-SATS lowers the NLL of patients 60 or older from 0.489 to 0.440 compared with TS with corruptions, but the NLL of patients under 60 rises from 0.152 to 0.174 and their ECE rises from 0.026 to 0.063. The ECE gap between the age groups falls from 0.058 to 0.038, but part of that is only because the younger group got worse. Overall ECE on HAM10000 rises from 0.022 to 0.037. On Fitzpatrick17k every group's average NLL improves and overall ECE falls from 0.035 to 0.023. Skin types V-VI go from 0.254 to 0.239, but most of that comes from noise. On clean images their NLL is 0.173 with GR-SATS against 0.162 without calibration, and on JPEG compression it is 0.294 against 0.241.
+
+I expected brightness and contrast changes to hurt darker skin types more, but I did not see that. At severities 3 to 5 the uncalibrated NLL of skin types V-VI is 0.161 to 0.172 on the four color corruptions, about the same as on clean images (0.162).
+
+I also checked what the shift score is picking up. On three of the four HAM10000 settings, patients 60 or older already have higher scores than patients under 60 on clean images, and the difference shrinks under corruption, for example from 0.69 to 0.30 for the DINOv2 probe. A group-balanced reference bank leaves it almost unchanged (0.67 and 0.29). So the score difference between the age groups does not come from corruption, and it does not come from how many reference images each group has either. On Fitzpatrick17k with DINOv2 features, the balanced bank removes 28\% (LP) and 40\% (LoRA) of the clean score difference between V-VI and I-II, so there part of it does come from V-VI being rare in training.
+
+The weakest setting for GR-SATS is HAM10000 with BiomedCLIP LoRA. In two of its three seeds patients 60 or older have lower clean scores than patients under 60, so the score no longer points at the worst group and GR-SATS is slightly worse than the worst-group global temperature (0.435 against 0.434). AAR is unstable in the same setting, with a worst-group NLL of 0.435, 0.536, and 0.416 over the three seeds. Its quadratic in atypicality has no constraint and can extrapolate badly to a held-out family, which is the kind of failure that the clipping and the positivity constraint in GR-SATS are meant to prevent.
 
 %% =========================================================
-\section{Project Execution Plan}
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{Answer to the Research Question}
+
+I asked whether a post-hoc calibrator that sees only the image can keep the worst-off group calibrated under corruptions it was not fit on, and how that depends on adaptation. The answer is partly yes. GR-SATS passes the pre-specified test against all three primary comparisons, and it matches an oracle that knows each test patient's group on the worst group's NLL (0.398 for both). It does not keep the worst group as well calibrated as on clean images, since worst-group NLL still rises with severity for every method in Figure~\ref{fig:severity}, only more slowly. Adaptation matters as well. The gain over TS with corruptions is 0.067 and 0.076 for the two HAM10000 probes but 0.027 and 0.024 for LoRA, and on Fitzpatrick17k it falls from 0.034 to 0.006 (DINOv2) and from 0.075 to 0.043 (BiomedCLIP). With TS on corruptions the LoRA models already have a lower worst-group NLL than the probes in all four pairs, so there is less left for GR-SATS to fix.
+
+The result I found most useful in practice is about plain temperature scaling. It is normally fit on clean validation images, and on HAM10000 that was worse than doing nothing for the worst group as soon as images were even mildly corrupted. Which way it goes depends on whether the model is over- or underconfident on clean data, and clean metrics do not warn about it, since clean TS has the best clean ECE in Table~\ref{tab:results}. Fitting the same single temperature on corrupted images already fixes a good part of this (0.503 to 0.442).
+
+\subsection{Why the Two Parts Help in Different Places}
+
+The shift score can only help the worst group if that group looks different in the score or if its errors grow with it. On the HAM10000 probes both things are true, so both parts help. On Fitzpatrick17k the score points at the wrong group. Skin types V-VI have the highest scores on clean images, but the worst group is I-II, so the worst-group loss has little to work with, and the gain comes from softening noisy images for everyone. On HAM10000 LoRA the shift score adds almost nothing, and for BiomedCLIP the reason is that the score no longer separates the age groups. So the worst-group loss only helps when one group's errors stand out, and the shift score only helps when the corruptions move the features far enough, and I would not assume either one on a new dataset.
+
+The tie with DAC-WG limits what I can claim. I expected the calibrator itself to be the main contribution, but the results show that the objective is the part that matters. Replacing DAC's average loss with a worst-group loss gives the same improvement, so the useful idea is the one in my approved proposal, which is to aim a shift-aware calibrator at the worst group. The inverse-temperature form mostly makes the fitting easier, because the problem is convex and the result does not depend on where the solver starts.
+
+\subsection{Which Group Is the Worst Group}
+
+I started this project expecting skin types V-VI to be the worst-off group. By NLL they are the best-off group in all four Fitzpatrick17k settings. That is mostly because only 8.8\% of their images are malignant, compared with 16.0\% for I-II, and a group with few positives has a low NLL even under a weak model. The same is true on HAM10000, where 26.0\% of the lesions of patients 60 or older are malignant against 5.1\% for patients under 60. This means that raw worst-group NLL protects the group with the highest cancer rate. I think that is reasonable for a biopsy decision, but it is not the same as protecting the group that is least represented in the data. The excess-NLL variant was meant to correct for this, and it did not help enough to replace the main version. With 32 cancers in V-VI I also cannot rule out a difference that this study is too small to see.
+
+\subsection{Cost to the Other Groups}
+
+Part of the improvement for the worst group comes at the expense of other groups. Patients under 60 get risks that are about twice as high as they should be under corruption, and clean images lose some calibration for everyone. This is the leveling down that MEDFAIR warns about \cite{zong2023medfair}. The cost can be avoided when the groups are known, since the per-group oracle reaches the same worst-group NLL with a better average NLL (0.287 against 0.295) and no harm to patients under 60. It needs each patient's sex and age at test time, though, which is the information GR-SATS is designed to do without. If those labels are available and allowed, I would fit per group. If they are not, there is a tradeoff between the worst group and everyone else. For example, a patient under 60 with a blurry photo could be sent for a biopsy they did not need.
+
+My results also agree with Roschewitz et al.\ \cite{roschewitz2025where} more than I expected. They found that calibrators built for shift do not reliably beat simple methods exposed to shifted data, and here a single temperature fit with Gaussian noise ranks second. With noise left out of the test, GR-SATS, DAC, and AAR do better than that simple fit, and with or without noise they keep clean ECE much lower, but the rank differences among these methods are within the Nemenyi critical difference.
+
+\subsection{Limitations}
+
+Most of the gain comes from the noise family, which is 4 of the 15 corruptions, and without noise the advantage is small. All corruptions are synthetic and come from one benchmark, so leaving one family out tests transfer to new corruptions but not to new hospitals or cameras. MedMNIST-C's black corners are also not graded evenly, since severity 4 is stronger than severity 5. Both datasets are dermatology with binary labels, and with 8 settings the rank test has little power.
+
+The validation and test images are pooled, so every fit and every test comes from the same two sources, and the bootstrap covers the sampling of images but not the choice of folds. V-VI has 32 cancers, so any statement about that group is weak. The worst-group fit needs group labels and labeled corrupted images while fitting, and its inverse temperature has a floor of 0.05, so it cannot soften very large wrong logits as far as DAC or AAR can.
+
+My DAC baseline uses only the final layer, while the official ViT version uses 13 layers, so a full DAC could be stronger than the one I compare against. My DAC and AAR are reimplementations from the papers and DAC's published code, and I did not check them against the official DAC code, although I had planned to. I also did not run TS with unrelated textures, multi-layer DAC, the ImageNet-supervised ViT, or full fine-tuning.
+
+%% =========================================================
+\section{Project Execution}
 \label{sec:plan}
 
-\subsection{Six-Week Research and Implementation Plan}
+\subsection{Six-Week Plan and What Happened}
 
-Table~\ref{tab:plan} lists the weekly objectives, tasks, and milestones from October 19 to November 29, 2026.
+Table~\ref{tab:plan} compares the six-week plan from my Phase 2 proposal with what happened. The experiments ran late. Data loading and the probes were finished in Week 3 instead of Week 1, and most of the remaining runs were done on November 21 and 22, in Week 5.
 
 \begin{table*}[t]
-  \caption{Six-week research and implementation plan.}
+  \caption{Six-week plan from October 19 to November 29, 2026, and what happened.}
   \label{tab:plan}
   \scriptsize
   \setlength{\tabcolsep}{4pt}
   \renewcommand{\arraystretch}{1.15}
-  \begin{tabularx}{\textwidth}{@{}P{1.3cm}P{2.1cm}LP{4.6cm}P{1.15cm}@{}}
+  \begin{tabularx}{\textwidth}{@{}P{1.3cm}P{2.1cm}P{5.2cm}LP{1.15cm}@{}}
     \toprule
-    \textbf{Week} & \textbf{Objective} & \textbf{Specific tasks} & \textbf{Expected output or milestone} & \textbf{Member} \\
+    \textbf{Planned week} & \textbf{Objective} & \textbf{Planned milestone} & \textbf{What happened} & \textbf{Member} \\
     \midrule
-    1 (Oct 19 to 25) & Data pipeline and linear probes & Write loaders with the label and group rules of Section~\ref{sec:data}, set up Colab notebooks that resume after a disconnect, build the folds, set up the 15 corruptions with per-image seeds, and train linear probes on frozen features with three seeds. & Counts that match Table~\ref{tab:data}, no lesion in two folds, and clean AUC for all 12 linear probes. & Adit Patel \\
+    1 (Oct 19 to 25) & Data pipeline and linear probes & Counts that match Table~\ref{tab:data}, no lesion in two folds, and clean AUC for all 12 linear probes. & Data loading was done by November 2 and all 12 probes by November 4. The counts match and no lesion crosses splits or folds. & Adit Patel \\
     \addlinespace
-    2 (Oct 26 to Nov 1) & LoRA models and pilot & Train the 12 LoRA models, save logits and distances for all clean and corrupted pooled images, fit clean TS, plot per-group NLL and ECE against severity, and run the pilot check of Section~\ref{sec:gonogo} with a quick worst-group fit. & Pilot report and a written go/no-go decision with the choice of main variant by November 1. & Adit Patel \\
+    2 (Oct 26 to Nov 1) & LoRA models and pilot & Pilot report and a go/no-go decision with the choice of main variant. & All 12 LoRA models were trained by November 21. The pilot on the HAM10000 probes passed on November 22. & Adit Patel \\
     \addlinespace
-    3 (Nov 2 to 8) & Method and baselines & Implement GR-SATS, its variants, DAC-WG, and the baselines, plus the cross-fitting harness with unit tests (zero slope gives TS, no flipped predictions, disjoint folds). & Every calibrator runs on one setting, and my TS and DAC numbers match the official code there. & Adit Patel \\
+    3 (Nov 2 to 8) & Method and baselines & Every calibrator runs on one setting, and my TS and DAC numbers match the official code there. & All calibrators ran with unit tests by November 22. The check against the official DAC code was not done. & Adit Patel \\
     \addlinespace
-    4 (Nov 9 to 15) & Main experiments & Run every calibrator on the 8 settings with three seeds, and compute all metrics, bootstrap intervals, and the Friedman and Nemenyi tests. & Filled Table~\ref{tab:results} and a verdict on H1 to H3. & Adit Patel \\
+    4 (Nov 9 to 15) & Main experiments & Filled Table~\ref{tab:results} and a verdict on H1 to H3. & All 8 settings with three seeds were finished on November 22, with the bootstrap, Friedman, and Nemenyi tests. & Adit Patel \\
     \addlinespace
-    5 (Nov 16 to 22) & Ablation and failure analysis & Fill Table~\ref{tab:ablation} with the $k$ sensitivity check, and run the analyses of Section~\ref{sec:failure}. & Ablation table, reliability diagrams, and a written analysis of why the method helps or fails. & Adit Patel \\
+    5 (Nov 16 to 22) & Ablation and failure analysis & Ablation table, reliability diagrams, and a written analysis. & Done on time, in Table~\ref{tab:ablation} and Section~\ref{sec:failure}. & Adit Patel \\
     \addlinespace
-    6 (Nov 23 to 29) & Final paper and reproducibility & Rerun one setting from scratch, write the results, discussion, and limitations, and prepare the poster. & Final paper, poster, and runnable code with setup and data instructions that rebuild every table. & Adit Patel \\
+    6 (Nov 23 to 29) & Final paper and reproducibility & One setting rerun from scratch, final paper, poster, and runnable code. & No setting was rerun fully from scratch. Refitting the probes gave the same results, and after remaking lost corruption files, refitting the calibrators matched the saved results. & Adit Patel \\
     \bottomrule
   \end{tabularx}
 \end{table*}
@@ -540,25 +633,29 @@ Table~\ref{tab:plan} lists the weekly objectives, tasks, and milestones from Oct
 \subsection{Go/No-Go Decision and Scope}
 \label{sec:gonogo}
 
-Ordinary training often gives group calibration on its own \cite{liu2019implicit}, so at the end of Week 2 I first check that there is something to fix. The pilot passes if, on at least one dataset, the worst-group fit lowers worst-group NLL by more than one bootstrap standard error compared with the average fit when both are fit directly on the evaluation images, and the worst group's mean shift score differs from the other groups' at severities 3 to 5. If neither dataset passes, I will switch to the measurement study, which reports the severity at which clean-fit calibration starts doing harm under each adaptation strategy. If the core grid finishes early, I will add an ImageNet-supervised ViT-B/16 \cite{dosovitskiy2021vit} and full fine-tuning. CheXpert \cite{irvin2019chexpert} and an LVM-Med ResNet-50 against an ImageNet ResNet-50 \cite{nguyen2023lvmmed,he2016resnet} would come after the semester. If compute runs short, I will cut the seeds from three to two before cutting any settings.
+Ordinary training often gives group calibration on its own \cite{liu2019implicit}, so before the full grid I checked that there was something to fix. The pilot would pass if, on at least one dataset, the worst-group fit lowered worst-group NLL by more than one bootstrap standard error compared with the average fit when both were fit directly on the evaluation images, and the worst group's mean shift score differed from the other groups' at severities 3 to 5. If neither dataset had passed, I would have switched to a pure measurement study. The HAM10000 probes passed both parts (Section~\ref{sec:results}), so I ran the full grid with all three seeds. The ImageNet-supervised ViT-B/16 \cite{dosovitskiy2021vit} and full fine-tuning were stretch goals and were not run. CheXpert \cite{irvin2019chexpert} and an LVM-Med ResNet-50 against an ImageNet ResNet-50 \cite{nguyen2023lvmmed,he2016resnet} are left for future work.
 
-Since the approved proposal, the title now names the method, the ImageNet ViT and full fine-tuning became stretch goals so that the core grid can be finished well, AAR became a main baseline after I found it in the survey, and DAC-WG was added so that the approved idea is tested directly. I will also write my own data loaders instead of using the FairMedFM code, because HAM10000 needs lesion-level splits and I count basal cell carcinoma as malignant \cite{zong2023medfair}.
+Since the approved proposal, the title now names the method, the ImageNet ViT and full fine-tuning became stretch goals, AAR became a main baseline after I found it in the survey, and DAC-WG was added so that the approved idea is tested directly. The project also uses its own data loaders instead of the FairMedFM code, because HAM10000 needs lesion-level splits and I count basal cell carcinoma as malignant \cite{zong2023medfair}.
 
 %% =========================================================
 \section{Team Member Contributions}
 
-I am the only member of this team, so every task in Table~\ref{tab:plan} is mine. So far I chose the topic, wrote and revised the project plan, set the scope of the survey, built the Connected Papers graphs, downloaded the datasets, and reviewed the paper list and the text. For the rest of the semester I am responsible for the data pipeline, model training, implementing GR-SATS and the baselines, running the experiments and statistical tests, making the figures, and writing the final paper.
+I am the only member of this team, so every task in Table~\ref{tab:plan} is mine. I chose the topic, wrote and revised the project plan, set the scope of the survey, built the Connected Papers graphs, downloaded the datasets, reviewed the paper list and the text, and ran the training, corruption, and calibration notebooks on Colab. Most of the code, the tables and figures, and the first drafts of the results and discussion were written with Claude, as described in Section~\ref{sec:llm}. I am responsible for all of it.
 
 %% =========================================================
 \section{Use of Generative AI and LLM Tools}
 \label{sec:llm}
 
-I used Claude Opus 5.5 (Anthropic) through the Claude Code agent in every phase. In Phases 0 and 1 it helped set up the LaTeX template, edit my proposal, download reference PDFs, pull citation lists from the Semantic Scholar API, screen about 450 titles against my criteria, confirm each paper's title, venue, and year, and draft the survey text and BibTeX. I built the Connected Papers graphs myself. For Phase 2 the agent reorganized the paper to follow the course template, drafted the new sections from my project plan, computed the counts in Table~\ref{tab:data} with a short Python script that reads the dataset label files, checked statements about other papers against their PDFs, and proofread the compiled draft against the Phase 2 requirements. No references were added in this phase. During the experiments I plan to use the agent for help with code, but every number in the final paper will come from my own runs, checked with small tests such as GR-SATS reducing to TS when its slope is zero and my TS and DAC results matching the official code. I reviewed and edited the text, and I am responsible for the final content.
+I used Claude Opus 5.5 (Anthropic) through the Claude Code agent in every phase. In Phases 0 and 1 it helped set up the LaTeX template, edit my proposal, download reference PDFs, pull citation lists from the Semantic Scholar API, screen about 450 titles against my criteria, confirm each paper's title, venue, and year, and draft the survey text and BibTeX. I built the Connected Papers graphs myself. For Phase 2 the agent reorganized the paper to follow the course template, drafted the new sections from my project plan, computed the counts in Table~\ref{tab:data} with a short Python script that reads the dataset label files, checked statements about other papers against their PDFs, and proofread the compiled draft against the Phase 2 requirements. No references were added in this phase. For the experiments the agent wrote most of the code, including the data loaders, training scripts, calibrators, statistical tests, and the script that makes the tables and plots, and I ran the training and calibration notebooks on Colab. The agent also drafted Sections~\ref{sec:results} and~\ref{sec:discussion} from the result files and updated the abstract, introduction, and conclusion to match them, and later edited the wording of the whole paper. The numbers come from those files, and the plots are made with matplotlib from the same files, with no AI-generated images. The code is checked with unit tests, for example that the global fit gives the same temperature as a direct search, that the shift-aware fit never flips a prediction, that DAC with a constant distance reduces to TS, and that no lesion is in two folds. I did not check my DAC results against the official code. I reviewed and edited the text, and I am responsible for the final content.
 
 %% =========================================================
 \section{Conclusion}
 
-This proposal targets a gap between two lines of work. Shift-aware calibrators keep average calibration under corruption, and group-aware calibrators protect groups only when test data look like calibration data. GR-SATS combines the two with a convex, two-parameter, worst-group fit on a standardized shift score. I will test it on HAM10000 and Fitzpatrick17k with DINOv2 and BiomedCLIP adapted by LP and LoRA, on corruption families held out from fitting, against simple baselines, DAC, and AAR. If it works, it gives a cheap way to keep risk estimates calibrated for the worst-off patients when image quality drops. If it does not, the study will still show at what corruption level clean-fit calibration stops being safe for each group.
+In this paper I tried to combine two lines of work. Shift-aware calibrators keep average calibration under corruption, and group-aware calibrators protect groups only when test data look like calibration data. GR-SATS uses a standardized shift score like the first and is fit for the worst group like the second, with two parameters and a convex problem. Over 8 settings on HAM10000 and Fitzpatrick17k, with corruption families held out from fitting, it lowers worst-group NLL and Brier score against TS with corruptions, DAC, and AAR, with bootstrap intervals that exclude zero.
+
+There are some important limits to this result. Most of the gain comes from noise corruptions, TS fit with Gaussian noise is better in half of the settings, clean calibration gets worse, and risks for patients under 60 become too high under corruption. DAC fit for the worst group does as well as GR-SATS, so changing the objective of a shift-aware calibrator matters more than its exact form. The measurements may end up being more useful than the calibrator. TS is usually fit on clean images, and that made the worst group worse on corrupted HAM10000 images in all four settings, while it helped the LoRA models on Fitzpatrick17k. Based on this, I would test any calibrator on corrupted images for each group before using it.
+
+Future work should test real shifts between hospitals and cameras, compare against the full multi-layer DAC, and look for a shift score that still points at the worst group after LoRA. It should also look for a fit that limits the cost to the other groups.
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{references}

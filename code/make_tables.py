@@ -24,6 +24,9 @@ NAMES = {
     "group_ts": "Group-wise TS$^\\dagger$", "group_grsats": "Per-group GR-SATS$^\\dagger$",
 }
 ORACLES = ["group_ts", "group_grsats"]
+# one color per method, the same in every figure (okabe-ito, safe for colorblind readers)
+COLORS = {"none": "#56b4e9", "ts_clean": "#e69f00", "ts_corr": "#009e73", "dac": "#cc79a7", "aar": "#0072b2",
+          "grsats": "#d55e00"}
 # order of the 8 settings in the tables and the severity figure
 ORDER = [(ds, f"{bb} {kind}") for ds in ["ham", "fitz"] for kind in ["lp", "lora"] for bb in ["dinov2", "biomedclip"]]
 SHORT = {"ham": "HAM", "fitz": "Fitz", "dinov2": "DINOv2", "biomedclip": "BiomedCLIP", "lp": "LP", "lora": "LoRA"}
@@ -74,7 +77,7 @@ def main_table(set_mean, ranks):
         for c, _, _ in cols:
             v = avg.loc[m, c]
             if c == "rank":
-                cells.append("--" if m in ORACLES else fmt(v, best[c], 2))
+                cells.append("n/a" if m in ORACLES else fmt(v, best[c], 2))
             else:
                 cells.append(fmt(v, None if m in ORACLES else best[c]))
         lines.append(f"{NAMES[m]} & " + " & ".join(cells) + " \\\\")
@@ -178,7 +181,7 @@ def severity_figure(set_mean):
     for ax, (ds, model) in zip(axes.ravel(), ORDER):
         for m in methods:
             y = set_mean.loc[(ds, model, m), [f"wg_nll sev{l}" for l in range(6)]]
-            ax.plot(range(6), y.to_numpy(), marker="o", ms=2.5, lw=1.2 if m == "grsats" else 0.9,
+            ax.plot(range(6), y.to_numpy(), color=COLORS[m], marker="o", ms=2.5, lw=1.2 if m == "grsats" else 0.9,
                     ls="--" if m in ["none", "ts_clean"] else "-", label=NAMES[m].replace(" (proposed)", ""))
         bb, kind = model.split()
         ax.set_title(f"{SHORT[ds]}, {SHORT[kind]}, {SHORT[bb]}")
@@ -229,7 +232,7 @@ def reliability_figure(rel, set_mean):
             w = x.groupby("bin")["n"].sum()
             risk = (x["mean risk"] * x["n"]).groupby(x["bin"]).sum() / w
             frac = (x["frac malignant"] * x["n"]).groupby(x["bin"]).sum() / w
-            ax.plot(risk, frac, marker="o", ms=2, lw=0.9, label=NAMES[m].replace(" (proposed)", ""))
+            ax.plot(risk, frac, color=COLORS[m], marker="o", ms=2, lw=0.9, label=NAMES[m].replace(" (proposed)", ""))
         ax.plot([0, 1], [0, 1], color="gray", lw=0.6, ls=":")
         ax.set_title(f"{'HAM10000' if ds == 'ham' else 'Fitzpatrick17k'}, group {g}")
         ax.set_xlabel("Predicted risk")
