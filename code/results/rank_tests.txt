@@ -1,0 +1,35 @@
+using ham_frozen_extra.csv
+using ham_lora_extra.csv
+using fitz_frozen_extra.csv
+using fitz_lora_extra.csv
+
+friedman over 8 settings and 9 methods: chi2 = 53.20, p = 9.9e-09
+nemenyi critical difference (alpha 0.05): 4.25. mean rank (1 = best):
+method
+grsats        1.75
+ts_gauss      2.00
+dac           3.38
+aar           4.00
+cluster_ts    4.88
+md_ts         5.88
+ts_corr       6.12
+none          8.25
+ts_clean      8.75
+
+h2: first severity where ts_clean is worse than none (worst-group nll, mean of 3 seeds)
+  fitz biomedclip lora first harm at severity None, ts_clean - none by severity: [-0.007 -0.031 -0.047 -0.057 -0.066 -0.072]
+  fitz biomedclip lp   first harm at severity 0, ts_clean - none by severity: [0.    0.002 0.005 0.007 0.01  0.012]
+  fitz dinov2 lora     first harm at severity None, ts_clean - none by severity: [-0.01  -0.024 -0.031 -0.037 -0.043 -0.049]
+  fitz dinov2 lp       first harm at severity 0, ts_clean - none by severity: [0.    0.001 0.001 0.001 0.001 0.002]
+  ham biomedclip lora first harm at severity 0, ts_clean - none by severity: [0.002 0.01  0.017 0.02  0.026 0.033]
+  ham biomedclip lp   first harm at severity 0, ts_clean - none by severity: [0.006 0.021 0.032 0.04  0.058 0.079]
+  ham dinov2 lora     first harm at severity 1, ts_clean - none by severity: [-0.001  0.012  0.021  0.027  0.032  0.039]
+  ham dinov2 lp       first harm at severity 0, ts_clean - none by severity: [0.006 0.046 0.069 0.083 0.091 0.089]
+
+success test: grsats minus each primary comparison, averaged over 8 settings x 3 seeds
+  wg nll   grsats - ts_corr  -0.0441  95% ci [-0.0525, -0.0365]
+  wg brier grsats - ts_corr  -0.0049  95% ci [-0.0064, -0.0035]
+  wg nll   grsats - dac      -0.0125  95% ci [-0.0174, -0.0082]
+  wg brier grsats - dac      -0.0017  95% ci [-0.0027, -0.0008]
+  wg nll   grsats - aar      -0.0223  95% ci [-0.0279, -0.0170]
+  wg brier grsats - aar      -0.0031  95% ci [-0.0042, -0.0021]
