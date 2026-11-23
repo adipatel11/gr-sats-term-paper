@@ -361,7 +361,7 @@ I kept the calibrator this small because the smallest group in Fitzpatrick17k ha
     \midrule
     1. Worst-off group under shift & Worst-group fit (C3) of an inverse temperature linear in the shift score (C2) & Picks the two parameters that minimize the largest group loss, as a convex problem & Lower worst-group NLL and Brier score than all three primary comparisons, with a cost to the best-off group on HAM10000 \\
     \addlinespace
-    2. Shift signal that transfers & Standardized, clipped log $k$-NN distance (C1), leave-one-family-out testing & Gives a unitless score that grows with severity and stays in the fitted range & Large gains on unseen noise, small ones on the other families and for LoRA \\
+    2. Shift signal that transfers & Standardized, clipped log $k$-NN distance (C1), leave-one-family-out testing & Gives a unitless score that grows with severity and stays in the fitted range & Large gains on unseen noise and on HAM10000 digital corruptions, small differences on the other families, and smaller gains for LoRA than for LP \\
     \addlinespace
     3. Small groups & Cross-fitting, proper scores, paired bootstrap over source images & Uses every pooled image for testing and gives intervals that are not too narrow & Intervals that exclude zero for the primary comparisons, while skin types V-VI stay uncertain \\
     \bottomrule
@@ -424,7 +424,7 @@ Models are trained on the official training split, with 10\% held out (grouped b
   \item \textbf{Baseline 3, group-aware calibrators.} Cluster-wise TS in the style of FairCal \cite{salvador2022faircal}, which fits one temperature per k-means cluster and needs no test-time group labels. Group-wise TS and a per-group version of GR-SATS fit one calibrator for each group cell (sex by age on HAM10000, skin type on Fitzpatrick17k) and use test-time group labels, so they serve only as oracles.
 \end{itemize}
 
-TS with my corruption families is the strongest simple baseline. DAC is the seed method and AAR is the closest existing method, so these three are the primary comparisons.
+I chose three primary comparisons before running the experiments. I expected TS with my corruption families to be the strongest simple baseline, DAC is the seed method, and AAR is the closest existing method. TS with Gaussian noise turned out to be stronger than TS with my corruption families (Section~\ref{sec:results}), but I did not change the comparisons.
 
 \subsection{Implementation Details}
 
@@ -498,7 +498,7 @@ For the three secondary criteria, two hold and one fails. GR-SATS closes at leas
   \centering
   \includegraphics[width=\textwidth]{figures/severity}
   \caption{Worst-group NLL against corruption severity in each setting, on held-out families. Dashed lines use no corrupted images.}
-  \Description{Eight line plots, one for each combination of dataset, adaptation, and backbone, with severity from 0 to 5 on the horizontal axis and worst-group NLL on the vertical axis. Every curve rises with severity. On HAM10000 clean-fit TS is the highest curve. On Fitzpatrick17k with LoRA no calibration is the highest curve. GR-SATS is lowest or close to lowest from severity 2 on.}
+  \Description{Eight line plots, one for each combination of dataset, adaptation, and backbone, with severity from 0 to 5 on the horizontal axis and worst-group NLL on the vertical axis. Every curve is higher at severity 5 than on clean images. From severity 1 on, clean-fit TS is the highest curve on HAM10000, and no calibration is the highest curve on Fitzpatrick17k with LoRA. GR-SATS is lowest or close to lowest from severity 2 on.}
   \label{fig:severity}
 \end{figure*}
 
@@ -548,7 +548,7 @@ I first looked at each corruption family by itself, and most of the gain comes f
 \begin{figure}[t]
   \centering
   \includegraphics[width=\columnwidth]{figures/reliability}
-  \caption{Reliability of the worst group at severities 3 to 5, in 15 equal-mass bins averaged over the four settings and three seeds of each dataset. Colors match Figure~\ref{fig:severity}.}
+  \caption{Reliability of the worst group at severities 3 to 5, in 15 equal-mass bins averaged over the four settings and three seeds of each dataset. The dotted line is perfect calibration, and colors match Figure~\ref{fig:severity}.}
   \Description{Two reliability diagrams. On HAM10000, group 60 or older, every method without the worst-group loss lies above the diagonal for predicted risks under 0.5, and GR-SATS is closest to the diagonal. On Fitzpatrick17k, group I-II, no calibration lies above the diagonal and the other methods are close to it.}
   \label{fig:reliability}
 \end{figure}
@@ -569,7 +569,7 @@ The weakest setting for GR-SATS is HAM10000 with BiomedCLIP LoRA. In two of its 
 
 \subsection{Answer to the Research Question}
 
-I asked whether a post-hoc calibrator that sees only the image can keep the worst-off group calibrated under corruptions it was not fit on, and how that depends on adaptation. The answer is partly yes. GR-SATS passes the pre-specified test against all three primary comparisons, and it matches an oracle that knows each test patient's group on the worst group's NLL (0.398 for both). It does not keep the worst group as well calibrated as on clean images, since worst-group NLL still rises with severity for every method in Figure~\ref{fig:severity}, only more slowly. Adaptation matters as well. The gain over TS with corruptions is 0.067 and 0.076 for the two HAM10000 probes but 0.027 and 0.024 for LoRA, and on Fitzpatrick17k it falls from 0.034 to 0.006 (DINOv2) and from 0.075 to 0.043 (BiomedCLIP). With TS on corruptions the LoRA models already have a lower worst-group NLL than the probes in all four pairs, so there is less left for GR-SATS to fix.
+I asked whether a post-hoc calibrator that sees only the image can keep the worst-off group calibrated under corruptions it was not fit on, and how that depends on adaptation. The answer is partly yes. GR-SATS passes the pre-specified test against all three primary comparisons, and it matches an oracle that knows each test patient's group on the worst group's NLL (0.398 for both). It does not keep the worst group as well calibrated as on clean images, since the worst-group NLL of every method in Figure~\ref{fig:severity} is still higher under corruption than on clean images. GR-SATS only makes the increase smaller. Adaptation matters as well. The gain over TS with corruptions is 0.067 and 0.076 for the two HAM10000 probes but 0.027 and 0.024 for LoRA, and on Fitzpatrick17k it falls from 0.034 to 0.006 (DINOv2) and from 0.075 to 0.043 (BiomedCLIP). With TS on corruptions the LoRA models already have a lower worst-group NLL than the probes in all four pairs, so there is less left for GR-SATS to fix.
 
 The result I found most useful in practice is about plain temperature scaling. It is normally fit on clean validation images, and on HAM10000 that was worse than doing nothing for the worst group as soon as images were even mildly corrupted. Which way it goes depends on whether the model is over- or underconfident on clean data, and clean metrics do not warn about it, since clean TS has the best clean ECE in Table~\ref{tab:results}. Fitting the same single temperature on corrupted images already fixes a good part of this (0.503 to 0.442).
 

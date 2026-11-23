@@ -11,10 +11,12 @@ The project asks whether calibration fit on clean images still holds up when der
 | `AditPatel_BiomedicalML_CSE_8673/` | The paper (`main.tex`, `references.bib`, ACM class files). This is what gets uploaded to Overleaf. |
 | `AditPatel_BiomedicalML_CSE_8673.pdf` | Latest compiled PDF from Overleaf |
 | `AditPatel_BiomedicalML_CSE_8673/literature_list.csv` | List of the papers in the literature review |
+| `code/` | All the experiment code, Colab notebooks, unit tests, results, tables and figures. `code/README.md` has the steps to run it. |
+| `NEXT_STEPS.md` | Where the project stands and what is left |
 | `data/DermaMNIST-C.csv`, `data/Fitzpatrick17k-C.csv` | Split and label files used for the data counts in the paper |
 | `get_reference_papers.py` | Downloads a PDF for every entry in `references.bib` |
 | `Approved_Topic_Phase0.txt`, `Seed_Papers_APatel_detailed_plan.txt` | Phase 0 topic approval and seed paper plan |
-| `Phase 2/`, `Phase 3/` | Phase instructions, course template and backups of earlier drafts |
+| `Phase 2/`, `Phase 3/`, `Phase 4/` | Phase instructions, course template and backups of earlier drafts |
 | `Seed paper graphs from connected papers/` | Connected Papers exports for the two seed papers |
 | `term_paper_description.txt` | Course description of the term paper |
 
@@ -32,4 +34,4 @@ I compile on Overleaf. Upload the contents of `AditPatel_BiomedicalML_CSE_8673/`
 
 ## Status
 
-Phase 2 (methodology and experiment plan) is done. Phase 3 (experiments and results) is in progress. The experiment code is in `code/`.
+The experiments are done and the paper has the full results and discussion. What's left is the Phase 3 poster and talk, and the Phase 4 final ZIP.
