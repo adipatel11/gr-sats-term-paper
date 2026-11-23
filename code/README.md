@@ -7,7 +7,7 @@ Code for the experiments in the paper. It loads the two datasets, trains the lin
 - `config.py`: paths and settings
 - `data.py`: loads HAM10000 and Fitzpatrick17k-C with their splits and groups
 - `models.py`: the two backbones and the LoRA layers
-- `metrics.py`: AUC and NLL, overall and per group
+- `metrics.py`: AUC, NLL, Brier score and ECE, overall and per group, plus debiased ECE
 - `check_data.py`: prints image counts, these should match the data table in the paper
 - `extract_features.py`: saves frozen features (GPU)
 - `train_probes.py`: linear probes on the saved features (CPU is fine)
@@ -23,6 +23,8 @@ Code for the experiments in the paper. It loads the two datasets, trains the lin
 - `notebooks/`: what I run on Colab
 
 ## How to run
+
+You need Python 3.12 or newer, since the pinned numpy doesn't install on older versions. I checked `requirements.txt` with Python 3.14.
 
 Run everything from this folder. There are 4 dataset and backbone combinations, each with 3 seeds, so 12 probes and 12 LoRA models.
 

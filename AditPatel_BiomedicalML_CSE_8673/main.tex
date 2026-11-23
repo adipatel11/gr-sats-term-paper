@@ -529,7 +529,7 @@ The first four rows of Table~\ref{tab:ablation} separate the two parts of GR-SAT
 
 The worst-group loss helps DAC as much as it helps my calibrator. DAC-WG reaches 0.397 and GR-SATS 0.398, which is a tie, and DAC fit for average NLL instead of squared error stays at 0.411. So the gain over DAC comes from the objective and not from my parameterization. The advantage of the linear inverse temperature is that the fit is convex, so a local optimum is also the global one, while DAC-WG is a local optimum found from two starting points.
 
-None of the other variants gave me a reason to change the main method. The bias variant has the same worst-group NLL (0.398) but lowers accuracy on the test pool from 0.891 to 0.887 on average, and from 0.896 to 0.876 on HAM10000 with the DINOv2 probe, so I kept GR-SATS without bias. The excess-NLL variant has a much better clean ECE (0.018) but gives up almost all of the gain from the group loss (0.413). Using $k = 1$ or $k = 50$, or a reference bank with equal numbers from each group, changes worst-group NLL by at most 0.001 on average.
+None of the other variants gave me a reason to change the main method. The bias variant has the same worst-group NLL (0.398) but lowers accuracy on the test pool from 0.891 to 0.887 on average, and from 0.896 to 0.876 on HAM10000 with the DINOv2 probe, so I kept GR-SATS without bias. The excess-NLL variant has a much better clean ECE (0.018) but gives up all of the gain from the group loss (0.413, against 0.412 for the average loss). Using $k = 1$ or $k = 50$, or a reference bank with equal numbers from each group, changes worst-group NLL by at most 0.001 on average.
 
 \subsection{Error and Failure Analysis}
 \label{sec:failure}
@@ -597,7 +597,7 @@ The validation and test images are pooled, so every fit and every test comes fro
 
 My DAC baseline uses only the final layer, while the official ViT version uses 13 layers, so a full DAC could be stronger than the one I compare against. My DAC and AAR are reimplementations from the papers and DAC's published code. I had planned to use the official code for both and to check my TS and DAC numbers against it, and I did neither.
 
-Some other parts of the Phase 2 plan were not run. These are TS with unrelated textures, multi-layer DAC, the ImageNet-supervised ViT, and full fine-tuning. I also did not rerun any setting from scratch. Refitting the probes and the calibrators gave the same numbers, but the LoRA models were trained only once per seed. The reliability diagrams pool severities 3 to 5 and were not made for each severity as planned, and I followed each group's NLL across severities but not its ECE.
+Some other parts of the Phase 2 plan were not run. These are TS with unrelated textures, multi-layer DAC, the ImageNet-supervised ViT, and full fine-tuning. I also did not rerun any setting from scratch. Refitting the probes and the calibrators gave the same numbers, but the LoRA models were trained only once per seed. The reliability diagrams pool severities 3 to 5 and were not made for each severity as planned, and I followed each group's NLL across severities but not its ECE. The plan also listed the debiased ECE estimator of Kumar et al.\ \cite{kumar2019verified}, which I computed but do not report, and worst groups for each HAM10000 attribute separately, where I only report the worst of all four groups.
 
 %% =========================================================
 \section{Project Execution}

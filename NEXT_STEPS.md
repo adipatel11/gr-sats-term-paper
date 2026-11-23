@@ -78,7 +78,7 @@ If asked:
 
 Phase 3 poster is due Thursday, Nov 26, 2026 at 11:59pm (Phase 3 Canvas Discussions).
 
-1. Done Nov 23: `main.tex` updated on Overleaf and the new PDF is here. Last edits: 5.4 (TS with corruptions is no longer called the strongest simple baseline), Table 2 row 2, 7.1 (NLL is still higher under corruption than on clean images), and the Figure 4 alt text and Figure 6 caption. The figures and tables did not change.
+1. Done Nov 23: `main.tex` updated on Overleaf and the new PDF is here. Last edits: 5.4 (TS with corruptions is no longer called the strongest simple baseline), Table 2 row 2, 7.1 (NLL is still higher under corruption than on clean images), and the Figure 4 alt text and Figure 6 caption. Later the same day: 6.3 (excess NLL gives up all of the group-loss gain) and 7.5 (debiased ECE and per-attribute worst groups were planned but not reported). The figures and tables did not change.
 2. Make the poster (single-slide PPTX), figures from `code/figures/` only. `framework.png` is the method diagram and `taxonomy.png` is the literature figure. Its numbers in brackets are the paper's references.
 3. Write and rehearse the 15-minute talk. Check on Canvas if it's live or recorded.
 
