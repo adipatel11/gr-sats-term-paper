@@ -41,6 +41,7 @@ def friedman(res):
     print(f"\nfriedman over {n} settings and {k} methods: chi2 = {stat:.2f}, p = {p:.2g}")
     print(f"nemenyi critical difference (alpha 0.05): {cd:.2f}. mean rank (1 = best):")
     print(ranks.round(2).to_string())
+    return ranks, stat, p, cd
 
 
 def h2(res):
@@ -81,10 +82,13 @@ def pooled_bootstrap():
                         diffs[(o, m)].append(wg(a) - wg(b))
                         point[(o, m)].append(max(a[g].mean() for g in masks) - max(b[g].mean() for g in masks))
     print("\nsuccess test: grsats minus each primary comparison, averaged over 8 settings x 3 seeds")
+    out = {}
     for (o, m), d in diffs.items():
         d = np.mean(d, axis=0)
         lo, hi = np.percentile(d, [2.5, 97.5])
-        print(f"  wg {m:5s} grsats - {o:8s} {np.mean(point[(o, m)]):+.4f}  95% ci [{lo:+.4f}, {hi:+.4f}]")
+        out[(o, m)] = (np.mean(point[(o, m)]), lo, hi)
+        print(f"  wg {m:5s} grsats - {o:8s} {out[(o, m)][0]:+.4f}  95% ci [{lo:+.4f}, {hi:+.4f}]")
+    return out
 
 
 def main():

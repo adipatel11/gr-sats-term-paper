@@ -1,0 +1,20 @@
+\begin{tabular}{@{}llcccc@{}}
+\toprule
+\textbf{Temperature} & \textbf{Loss} & \textbf{WG NLL} & \textbf{HAM} & \textbf{Fitz} & \textbf{NLL} \\
+\midrule
+Global & Average (TS with corruptions) & 0.442 & 0.489 & 0.396 & 0.312 \\
+Global & Worst group & 0.423 & 0.455 & 0.391 & 0.312 \\
+Shift-aware & Average & 0.412 & 0.464 & 0.360 & \textbf{0.292} \\
+Shift-aware & Worst group (GR-SATS) & 0.398 & 0.440 & 0.356 & 0.295 \\
+\midrule
+\multicolumn{2}{@{}l}{GR-SATS with excess NLL} & 0.413 & 0.456 & 0.369 & 0.296 \\
+\multicolumn{2}{@{}l}{GR-SATS with bias term} & 0.398 & 0.442 & \textbf{0.353} & 0.298 \\
+\multicolumn{2}{@{}l}{DAC, average squared error} & 0.411 & 0.457 & 0.364 & 0.293 \\
+\multicolumn{2}{@{}l}{DAC, average NLL} & 0.411 & 0.461 & 0.361 & \textbf{0.292} \\
+\multicolumn{2}{@{}l}{DAC-WG, worst-group NLL} & \textbf{0.397} & 0.439 & 0.356 & 0.295 \\
+\midrule
+\multicolumn{2}{@{}l}{GR-SATS, $k = 1$} & 0.398 & \textbf{0.438} & 0.357 & 0.295 \\
+\multicolumn{2}{@{}l}{GR-SATS, $k = 50$} & 0.399 & 0.441 & 0.357 & 0.295 \\
+\multicolumn{2}{@{}l}{GR-SATS, group-balanced bank} & 0.399 & 0.441 & 0.357 & 0.295 \\
+\bottomrule
+\end{tabular}

@@ -1,0 +1,18 @@
+\begin{tabular}{@{}lccccccc@{}}
+\toprule
+\textbf{Method} & \textbf{WG NLL} & \textbf{WG NLL, no noise} & \textbf{WG Brier} & \textbf{NLL} & \textbf{Clean ECE} & \textbf{Clean AUC} & \textbf{Rank} \\
+\midrule
+No calibration & 0.489 & 0.391 & 0.132 & 0.340 & 0.018 & \textbf{0.940} & 8.25 \\
+TS, clean & 0.503 & 0.400 & 0.134 & 0.339 & \textbf{0.013} & 0.939 & 8.75 \\
+TS, Gaussian noise & 0.401 & 0.365 & 0.125 & 0.295 & 0.073 & 0.939 & 2.00 \\
+TS, corruptions & 0.442 & 0.363 & 0.128 & 0.312 & 0.038 & 0.939 & 6.12 \\
+DAC & 0.411 & 0.358 & 0.125 & \textbf{0.293} & 0.018 & 0.938 & 3.38 \\
+Multi-domain TS & 0.447 & 0.371 & 0.129 & 0.312 & 0.015 & 0.939 & 5.88 \\
+AAR & 0.420 & 0.361 & 0.127 & 0.300 & 0.017 & 0.939 & 4.00 \\
+Cluster-wise TS & 0.428 & 0.368 & 0.127 & 0.302 & 0.020 & 0.939 & 4.88 \\
+GR-SATS (proposed) & \textbf{0.398} & \textbf{0.354} & \textbf{0.123} & 0.295 & 0.028 & 0.938 & \textbf{1.75} \\
+\midrule
+Group-wise TS$^\dagger$ & 0.423 & 0.361 & 0.126 & 0.306 & 0.038 & 0.939 & -- \\
+Per-group GR-SATS$^\dagger$ & 0.398 & 0.354 & 0.123 & 0.287 & 0.019 & 0.938 & -- \\
+\bottomrule
+\end{tabular}

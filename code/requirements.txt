@@ -6,6 +6,7 @@ torchvision
 open_clip_torch
 transformers
 tqdm
+matplotlib
 opencv-python
 scikit-image
 wand
