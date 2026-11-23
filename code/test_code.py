@@ -5,7 +5,7 @@ from scipy.optimize import minimize_scalar
 from scipy.special import expit
 from torch import nn
 
-from calibrate import atypicality, fit, fit_dac, make_folds, positivity, weights
+from calibrate import atypicality, fit, fit_1d, fit_dac, make_folds, positivity, weights
 from calibrate_extra import fit_dac_nll, fit_md_ts
 from data import add_dev, load_fitz, load_ham
 from metrics import debiased_ce
@@ -90,6 +90,16 @@ def test_global_fit_is_temperature_scaling():
     beta = fit(z[:, None], y, weights("clean", sev, []), positivity("global", 0, 0))[0]
     nll = lambda b: np.mean(np.logaddexp(0, b * z) - y * b * z)
     assert abs(beta - minimize_scalar(nll, bounds=(0.01, 10), method="bounded").x) < 1e-3
+
+
+def test_1d_search_matches_slsqp():
+    # the fallback for when slsqp gives up should land on the same worst-group temperature
+    z, y = fake_logits()
+    sev = np.repeat(np.arange(6), len(z) // 6 + 1)[:len(z)]
+    W = weights("wg", sev, [z > 0, z <= 0])
+    C = positivity("global", 0, 0)
+    losses = lambda t: W @ (np.logaddexp(0, z * t[0]) - y * z * t[0])
+    assert abs(fit(z[:, None], y, W, C)[0] - fit_1d(losses, C)[0]) < 1e-4
 
 
 def test_shift_fit_never_flips_predictions():

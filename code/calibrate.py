@@ -7,7 +7,7 @@ import joblib
 import numpy as np
 import pandas as pd
 import torch
-from scipy.optimize import minimize
+from scipy.optimize import minimize, minimize_scalar
 from scipy.special import expit
 from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import StratifiedGroupKFold
@@ -162,8 +162,22 @@ def fit(A, y, W, C, offset=0):
              "jac": lambda x: np.hstack([C, np.zeros((len(C), 1))])}]
     res = minimize(lambda x: x[-1], x0, jac=lambda x: np.eye(p + 1)[-1], constraints=cons,
                    method="SLSQP", options={"maxiter": 1000, "ftol": 1e-10})
+    if not res.success and p == 1:
+        # slsqp sometimes gives up on very confident lora logits ("positive directional derivative").
+        # with one parameter (plain ts) just search over log(beta) instead. the worst-group loss is a
+        # max of convex functions of beta, so it has one minimum and the bounded search finds it
+        print(f"  slsqp failed ({res.message}), using the 1-d search")
+        return fit_1d(losses, C)
     assert res.success, res.message
     return res.x[:-1]
+
+
+def fit_1d(losses, C):
+    # beta has to stay above EPS / C (the positivity constraint), and 1000 is far past any real fit
+    lo = np.log(EPS / C[0, 0])
+    res = minimize_scalar(lambda b: losses(np.array([np.exp(b)])).max(), bounds=(lo, np.log(1000)),
+                          method="bounded", options={"xatol": 1e-8})
+    return np.array([np.exp(res.x)])
 
 
 def fit_dac(z, d, y, w):
