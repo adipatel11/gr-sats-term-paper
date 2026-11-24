@@ -27,6 +27,9 @@ ORACLES = ["group_ts", "group_grsats"]
 # one color per method, the same in every figure (okabe-ito, safe for colorblind readers)
 COLORS = {"none": "#56b4e9", "ts_clean": "#e69f00", "ts_corr": "#009e73", "dac": "#cc79a7", "aar": "#0072b2",
           "grsats": "#d55e00"}
+# methods in the severity figures
+CURVES = ["none", "ts_clean", "ts_corr", "dac", "aar", "grsats"]
+LONG = {"ham": "HAM10000", "fitz": "Fitzpatrick17k"}
 # order of the 8 settings in the tables and the severity figure
 ORDER = [(ds, f"{bb} {kind}") for ds in ["ham", "fitz"] for kind in ["lp", "lora"] for bb in ["dinov2", "biomedclip"]]
 SHORT = {"ham": "HAM", "fitz": "Fitz", "dinov2": "DINOv2", "biomedclip": "BiomedCLIP", "lp": "LP", "lora": "LoRA"}
@@ -198,6 +201,82 @@ def severity_figure(set_mean):
     save(fig, "severity.pdf")
 
 
+def short_name(m):
+    return NAMES[m].replace(" (proposed)", "")
+
+
+def method_lines(ax, curves, sevs):
+    # one line per method, same style as the severity figure. curves has one row per method
+    for m in CURVES:
+        ax.plot(sevs, curves.loc[m, sevs].to_numpy(), color=COLORS[m], marker="o", ms=2.5,
+                lw=1.2 if m == "grsats" else 0.9, ls="--" if m in ["none", "ts_clean"] else "-", label=short_name(m))
+    ax.set_xticks(sevs)
+    ax.grid(alpha=0.3, lw=0.5)
+
+
+def sev_curves(det, ds, metric, group=None):
+    # method x severity table for one dataset, on its main test pool plus clean. group None means the worst
+    # group of each model, seed and severity. mean over the 4 settings and 3 seeds
+    d = det[(det["dataset"] == ds) & det["method"].isin(CURVES) & det["family"].isin(POOL_FAMS[ds] + ["clean"])]
+    d = d[d["group"] != "all"] if group is None else d[d["group"] == group]
+    v = d.groupby(["model", "seed", "method", "severity", "group"])[metric].mean()
+    return v.groupby(["model", "seed", "method", "severity"]).max().groupby(["method", "severity"]).mean().unstack()
+
+
+def brier_figure(det):
+    # the second success metric (worst-group brier) and the average nll over all images, against severity
+    fig, axes = plt.subplots(2, 2, figsize=(3.4, 3.1), sharex=True)
+    rows = [("brier", None, "Worst-group Brier"), ("nll", "all", "Average NLL")]
+    for row, (metric, group, label) in zip(axes, rows):
+        for ax, ds in zip(row, ["ham", "fitz"]):
+            method_lines(ax, sev_curves(det, ds, metric, group), list(range(6)))
+            ax.set_ylabel(label)
+    for ax, ds in zip(axes[0], ["ham", "fitz"]):
+        ax.set_title(LONG[ds])
+    for ax in axes[1]:
+        ax.set_xlabel("Severity (0 = clean)")
+    fig.tight_layout(rect=(0, 0, 1, 0.91))
+    fig.legend(*axes[0, 0].get_legend_handles_labels(), loc="upper center", ncol=3, frameon=False)
+    save(fig, "brier.pdf")
+
+
+def families_figure(det):
+    # worst-group nll against severity when each family is the held-out one (severity 0 is left out because
+    # clean images are the same for every family)
+    fams = list(FAMILIES)
+    fig, axes = plt.subplots(2, len(fams), figsize=(7, 3.1), sharex=True, sharey="row")
+    for row, ds in zip(axes, ["ham", "fitz"]):
+        d = det[(det["dataset"] == ds) & det["method"].isin(CURVES) & (det["group"] != "all")]
+        for ax, fam in zip(row, fams):
+            v = d[d["family"] == fam].groupby(["model", "seed", "method", "severity", "group"])["nll"].mean()
+            c = v.groupby(["model", "seed", "method", "severity"]).max().groupby(["method", "severity"]).mean()
+            method_lines(ax, c.unstack(), list(range(1, 6)))
+            ax.set_title(f"{SHORT[ds]}, {fam}" + ("*" if fam not in POOL_FAMS[ds] else ""))
+            ax.set_ylabel("Worst-group NLL")
+            ax.tick_params(labelleft=True)
+    for ax in axes[1]:
+        ax.set_xlabel("Severity")
+    fig.tight_layout(rect=(0, 0, 1, 0.94))
+    fig.legend(*axes[0, 0].get_legend_handles_labels(), loc="upper center", ncol=len(CURVES), frameon=False)
+    save(fig, "families.pdf")
+
+
+def tradeoff_figure(det):
+    # nll of the worst and best group of each dataset under every method (what the worst group gains and
+    # what the best group pays)
+    fig, axes = plt.subplots(2, 2, figsize=(3.4, 3.1), sharex=True)
+    for row, (ds, groups) in zip(axes, [("ham", ["60+", "<60"]), ("fitz", ["I-II", "V-VI"])]):
+        for ax, g in zip(row, groups):
+            method_lines(ax, sev_curves(det, ds, "nll", g), list(range(6)))
+            ax.set_title(f"{SHORT[ds]}, {g} ({'worst' if g == groups[0] else 'best'} group)")
+            ax.set_ylabel("NLL")
+    for ax in axes[1]:
+        ax.set_xlabel("Severity (0 = clean)")
+    fig.tight_layout(rect=(0, 0, 1, 0.91))
+    fig.legend(*axes[0, 0].get_legend_handles_labels(), loc="upper center", ncol=3, frameon=False)
+    save(fig, "tradeoff.pdf")
+
+
 def groups_figure(det):
     # h1: per-group nll of clean-fit ts against severity, mean over the 4 settings of each dataset
     fig, axes = plt.subplots(1, 2, figsize=(3.4, 1.7))
@@ -300,7 +379,10 @@ def main():
     success_table(boot)
     family_table(det)
     severity_figure(set_mean)
+    brier_figure(det)
     groups_figure(det)
+    tradeoff_figure(det)
+    families_figure(det)
     reliability_figure(rel, set_mean)
     cd_figure(ranks, cd)
 

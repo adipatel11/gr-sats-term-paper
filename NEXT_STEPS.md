@@ -80,7 +80,8 @@ If asked:
 Phase 3 poster is due Thursday, Nov 26, 2026 at 11:59pm (Phase 3 Canvas Discussions).
 
 1. Done Nov 23: `main.tex` updated on Overleaf and the new PDF is here. Last edits: 5.4 (TS with corruptions is no longer called the strongest simple baseline), Table 2 row 2, 7.1 (NLL is still higher under corruption than on clean images), and the Figure 4 alt text and Figure 6 caption. Later the same day: 6.3 (excess NLL gives up all of the group-loss gain) and 7.5 (debiased ECE and per-attribute worst groups were planned but not reported). After that, 6.4 (the ECE gap between the sexes and between skin types goes up compared with TS corr) and y-axis labels on every panel of Figures 4, 5 and 6. The tables did not change.
+   - Done Nov 24, on Overleaf and in the PDF here (15 pages): Dr. Kurma asked for at least four result figures with trends against the baselines, plus one process figure. Added `brier`, `families` and `tradeoff` (Figures 3, 7 and 9, Sections 6.1 and 6.4). With the severity figure (now Figure 5) that makes four. The process figure is Figure 2. Old Figures 3 to 6 are now 4, 5, 6 and 8.
 2. Make the poster (single-slide PPTX), figures from `code/figures/` only. `framework.png` is the method diagram and `taxonomy.png` is the literature figure. Its numbers in brackets are the paper's references.
 3. Write and rehearse the 15-minute talk. Check on Canvas if it's live or recorded.
 
-Phase 4 ZIP, later: follow `Phase 4/task.md`, put the 6 PNGs in `06_Figures/`, and leave out `Reference papers/`. If Figure 1 or 2 changes in `main.tex`, the two crops have to be remade.
+Phase 4 ZIP, later: follow `Phase 4/task.md`, put the 9 PNGs in `06_Figures/`, and leave out `Reference papers/`. If Figure 1 or 2 changes in `main.tex`, the two crops have to be remade.

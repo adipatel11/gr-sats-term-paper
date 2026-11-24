@@ -478,6 +478,16 @@ I tested three hypotheses. The first (H1) is that the worst-group NLL of clean-f
 
 I start with H3, since it is the main test of the method. GR-SATS has the lowest worst-group NLL (0.398) and worst-group Brier score (0.123) in Table~\ref{tab:results}, and the best mean rank (1.75). Table~\ref{tab:success} shows the pre-specified test. GR-SATS lowers worst-group NLL by 0.044 against TS with corruptions, 0.013 against DAC, and 0.022 against AAR, and all six intervals exclude zero, so it passes the success criterion against all three primary comparisons. Testing each setting and seed separately gives 24 intervals per comparison. GR-SATS wins all 24 against TS with corruptions, wins 22 against DAC with one tie and one loss, and wins 18 against AAR with five ties and one loss. Both losses are on one HAM10000 BiomedCLIP LoRA seed.
 
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/brier}
+  \caption{Worst-group Brier score (top) and average NLL over all images (bottom) against severity, on held-out families and averaged over the four settings of each dataset. Severity 0 is clean.}
+  \Description{Four line plots comparing six methods. GR-SATS has the lowest worst-group Brier score at severities 1 to 5 on both datasets. It also has the lowest average NLL at severities 1 to 5 on Fitzpatrick17k, but on HAM10000 DAC has the lowest average NLL and GR-SATS is close to TS with corruptions.}
+  \label{fig:brier}
+\end{figure}
+
+Figure~\ref{fig:brier} shows the second metric of the success test, the worst-group Brier score, against severity. GR-SATS has the lowest score of the six methods at every severity from 1 to 5 on both datasets, and its advantage over TS with corruptions grows with severity, from 0.001 at severity 1 to 0.010 at severity 5 on HAM10000 and from 0.002 to 0.003 on Fitzpatrick17k. On clean HAM10000 images it has the highest score of the six (0.093 against 0.091 for no calibration). The bottom row shows the average NLL over all images. GR-SATS is also lowest there on Fitzpatrick17k from severity 1 on, but on HAM10000 DAC is lowest, and at severity 5 GR-SATS is 0.012 above it and about the same as TS with corruptions.
+
 The rank tests give weaker evidence. The Friedman test rejects the hypothesis that the nine methods are equal ($\chi^2 = 53.2$, $p < 10^{-7}$), but the Nemenyi critical difference with only 8 settings is 4.25. So GR-SATS is significantly better than TS with corruptions, no calibration, and clean TS, but I cannot say that for DAC, AAR, multi-domain TS, cluster-wise TS, or TS with Gaussian noise (Figure~\ref{fig:cd}).
 
 GR-SATS is also not the best method in every setting. Table~\ref{tab:settings} shows that it is best or tied for best in four of the 8 settings, and TS with Gaussian noise is best in the other four. That baseline is fit on MedMNIST-C's Gaussian noise at all five severities, so it has seen the noise family that the other methods have to extrapolate to. With the noise family left out of the test pool, GR-SATS has a worst-group NLL of 0.354 and TS with Gaussian noise has 0.365, and GR-SATS is better in 6 of 8 settings. TS with Gaussian noise also has the worst clean ECE in the table (0.073), because it softens clean images as much as noisy ones.
@@ -543,7 +553,15 @@ None of the other variants gave me a reason to change the main method. The bias 
   \input{tables/families}
 \end{table}
 
-I first looked at each corruption family by itself, and most of the gain comes from noise (Table~\ref{tab:families}). When noise is held out, GR-SATS lowers worst-group NLL from 0.728 to 0.572 on HAM10000 and from 0.555 to 0.447 on Fitzpatrick17k compared with TS with corruptions. Digital corruptions on HAM10000 also improve clearly, from 0.483 to 0.423. On the other families the differences are small, and TS with corruptions is the best of the four on color and task-specific corruptions on HAM10000 and on digital corruptions on Fitzpatrick17k. Leaving noise out of the pool, the gain of GR-SATS over TS with corruptions drops from 0.044 to 0.009, and in three of the four LoRA settings the two are within 0.002 of each other. On Fitzpatrick17k's task-specific corruptions, no calibration (0.285) is better than GR-SATS (0.299).
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\textwidth]{figures/families}
+  \caption{Worst-group NLL against severity when each family is the held-out one, averaged over the four settings of each dataset. The vertical axis is the same within a row. $^*$Not in the main pool for Fitzpatrick17k.}
+  \Description{Ten line plots, one for each dataset and corruption family, comparing six methods at severities 1 to 5. On noise the curves spread far apart and GR-SATS is lowest on both datasets. On digital corruptions GR-SATS is lowest on HAM10000. On color and task-specific corruptions the curves are close together.}
+  \label{fig:families}
+\end{figure*}
+
+I first looked at each corruption family by itself, and most of the gain comes from noise (Table~\ref{tab:families}). When noise is held out, GR-SATS lowers worst-group NLL from 0.728 to 0.572 on HAM10000 and from 0.555 to 0.447 on Fitzpatrick17k compared with TS with corruptions. Digital corruptions on HAM10000 also improve clearly, from 0.483 to 0.423. On the other families the differences are small, and TS with corruptions is the best of the four on color and task-specific corruptions on HAM10000 and on digital corruptions on Fitzpatrick17k. Figure~\ref{fig:families} shows the same families against severity. With noise held out, the advantage of GR-SATS over TS with corruptions grows from 0.037 at severity 1 to 0.195 at severity 5 on HAM10000 and from 0.009 to 0.147 on Fitzpatrick17k. On the color and task-specific families, TS with corruptions, DAC, AAR, and GR-SATS stay within 0.02 of each other at every severity. Leaving noise out of the pool, the gain of GR-SATS over TS with corruptions drops from 0.044 to 0.009, and in three of the four LoRA settings the two are within 0.002 of each other. On Fitzpatrick17k's task-specific corruptions, no calibration (0.285) is better than GR-SATS (0.299).
 
 \begin{figure}[t]
   \centering
@@ -555,7 +573,15 @@ I first looked at each corruption family by itself, and most of the gain comes f
 
 Under corruption the uncalibrated models underestimate the risk of the worst groups. For patients 60 or older at severities 3 to 5 the mean predicted risk is 17.1\%, while 26.0\% of the lesions are malignant, and Figure~\ref{fig:reliability} shows the same thing bin by bin. GR-SATS raises the mean to 22.3\% and is closest to the diagonal. For skin types I-II it raises the mean from 9.3\% to 14.3\%, against a true rate of 16.0\%. The downside is that risks become too high for the groups with low cancer rates. For patients under 60 the mean predicted risk rises from 5.9\% to 11.4\% when only 5.1\% of the lesions are malignant, and for skin types V-VI it rises from 6.8\% to 12.1\% against 8.8\%. A temperature pulls every risk toward 0.5, so it cannot raise the risk of one group without raising that of another group with similar scores.
 
-The per-group results show the same cost. On HAM10000, GR-SATS lowers the NLL of patients 60 or older from 0.489 to 0.440 compared with TS with corruptions, but the NLL of patients under 60 rises from 0.152 to 0.174 and their ECE rises from 0.026 to 0.063. The ECE gap between the age groups falls from 0.058 to 0.038, but part of that is only because the younger group got worse. Overall ECE on HAM10000 rises from 0.022 to 0.037. On Fitzpatrick17k every group's average NLL improves and overall ECE falls from 0.035 to 0.023. The ECE gap does not shrink everywhere, though. Compared with TS with corruptions it rises from 0.007 to 0.012 between the sexes on HAM10000 and from 0.012 to 0.020 between skin types on Fitzpatrick17k, where the ECE of V-VI goes from 0.038 to 0.040. The NLL of skin types V-VI goes from 0.254 to 0.239, but most of that comes from noise. On clean images their NLL is 0.173 with GR-SATS against 0.162 without calibration, and on JPEG compression it is 0.294 against 0.241.
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/tradeoff}
+  \caption{NLL of the worst and the best group of each dataset under each method, on held-out families and averaged over the four settings. The vertical axes are different.}
+  \Description{Four line plots comparing six methods. GR-SATS has the lowest NLL for patients 60 or older and for skin types I-II at severities 1 to 5. For patients under 60 it has the highest NLL at severities 1 to 5. For skin types V-VI it is close to DAC and AAR.}
+  \label{fig:tradeoff}
+\end{figure}
+
+The per-group results show the same cost. On HAM10000, GR-SATS lowers the NLL of patients 60 or older from 0.489 to 0.440 compared with TS with corruptions, but the NLL of patients under 60 rises from 0.152 to 0.174 and their ECE rises from 0.026 to 0.063. The ECE gap between the age groups falls from 0.058 to 0.038, but part of that is only because the younger group got worse. Figure~\ref{fig:tradeoff} shows the NLL of the worst and best groups across severities. For patients 60 or older, GR-SATS has the lowest NLL of the six methods from severity 1 on. For patients under 60 it has the highest, and at severity 5 their NLL is 0.191 against 0.162 for TS with corruptions and 0.161 without calibration. On Fitzpatrick17k, from severity 1 on, it has the lowest NLL for skin types I-II and stays within 0.005 of DAC for V-VI. Overall ECE on HAM10000 rises from 0.022 to 0.037. On Fitzpatrick17k every group's average NLL improves and overall ECE falls from 0.035 to 0.023. The ECE gap does not shrink everywhere, though. Compared with TS with corruptions it rises from 0.007 to 0.012 between the sexes on HAM10000 and from 0.012 to 0.020 between skin types on Fitzpatrick17k, where the ECE of V-VI goes from 0.038 to 0.040. The NLL of skin types V-VI goes from 0.254 to 0.239, but most of that comes from noise. On clean images their NLL is 0.173 with GR-SATS against 0.162 without calibration, and on JPEG compression it is 0.294 against 0.241.
 
 I expected brightness and contrast changes to hurt darker skin types more, but I did not see that. At severities 3 to 5 the uncalibrated NLL of skin types V-VI is 0.161 to 0.172 on the four color corruptions, about the same as on clean images (0.162).
 
@@ -589,24 +615,7 @@ Part of the improvement for the worst group comes at the expense of other groups
 
 My results also agree with Roschewitz et al.\ \cite{roschewitz2025where} more than I expected. They found that calibrators built for shift do not reliably beat simple methods exposed to shifted data, and here a single temperature fit with Gaussian noise ranks second. With noise left out of the test, GR-SATS, DAC, and AAR do better than that simple fit, and with or without noise they keep clean ECE much lower, but the rank differences among these methods are within the Nemenyi critical difference.
 
-\subsection{Limitations}
-
-Most of the gain comes from the noise family, which is 4 of the 15 corruptions, and without noise the advantage is small. All corruptions are synthetic and come from one benchmark, so leaving one family out tests transfer to new corruptions but not to new hospitals or cameras. MedMNIST-C's black corners are also not graded evenly, since severity 4 is stronger than severity 5. Both datasets are dermatology with binary labels, and with 8 settings the rank test has little power.
-
-The validation and test images are pooled, so every fit and every test comes from the same two sources, and the bootstrap covers the sampling of images but not the choice of folds. V-VI has 32 cancers, so any statement about that group is weak. The worst-group fit needs group labels and labeled corrupted images while fitting, and its inverse temperature has a floor of 0.05, so it cannot soften very large wrong logits as far as DAC or AAR can.
-
-My DAC baseline uses only the final layer, while the official ViT version uses 13 layers, so a full DAC could be stronger than the one I compare against. My DAC and AAR are reimplementations from the papers and DAC's published code. I had planned to use the official code for both and to check my TS and DAC numbers against it, and I did neither.
-
-Some other parts of the Phase 2 plan were not run. These are TS with unrelated textures, multi-layer DAC, the ImageNet-supervised ViT, and full fine-tuning. I also did not rerun any setting from scratch. Refitting the probes and the calibrators gave the same numbers, but the LoRA models were trained only once per seed. The reliability diagrams pool severities 3 to 5 and were not made for each severity as planned, and I followed each group's NLL across severities but not its ECE. The plan also listed the debiased ECE estimator of Kumar et al.\ \cite{kumar2019verified}, which I computed but do not report, and worst groups for each HAM10000 attribute separately, where I only report the worst of all four groups.
-
-%% =========================================================
-\section{Project Execution}
-\label{sec:plan}
-
-\subsection{Six-Week Plan and What Happened}
-
-Table~\ref{tab:plan} compares the six-week plan from my Phase 2 proposal with what happened. The experiments ran late. Data loading and the probes were finished in Week 3 instead of Week 1, and most of the remaining runs were done on November 21 and 22, in Week 5.
-
+%% Table of Section 8, placed early so it does not land in the references
 \begin{table*}[t]
   \caption{Six-week plan from October 19 to November 29, 2026, and what happened.}
   \label{tab:plan}
@@ -631,6 +640,24 @@ Table~\ref{tab:plan} compares the six-week plan from my Phase 2 proposal with wh
     \bottomrule
   \end{tabularx}
 \end{table*}
+
+\subsection{Limitations}
+
+Most of the gain comes from the noise family, which is 4 of the 15 corruptions, and without noise the advantage is small. All corruptions are synthetic and come from one benchmark, so leaving one family out tests transfer to new corruptions but not to new hospitals or cameras. MedMNIST-C's black corners are also not graded evenly, since severity 4 is stronger than severity 5. Both datasets are dermatology with binary labels, and with 8 settings the rank test has little power.
+
+The validation and test images are pooled, so every fit and every test comes from the same two sources, and the bootstrap covers the sampling of images but not the choice of folds. V-VI has 32 cancers, so any statement about that group is weak. The worst-group fit needs group labels and labeled corrupted images while fitting, and its inverse temperature has a floor of 0.05, so it cannot soften very large wrong logits as far as DAC or AAR can.
+
+My DAC baseline uses only the final layer, while the official ViT version uses 13 layers, so a full DAC could be stronger than the one I compare against. My DAC and AAR are reimplementations from the papers and DAC's published code. I had planned to use the official code for both and to check my TS and DAC numbers against it, and I did neither.
+
+Some other parts of the Phase 2 plan were not run. These are TS with unrelated textures, multi-layer DAC, the ImageNet-supervised ViT, and full fine-tuning. I also did not rerun any setting from scratch. Refitting the probes and the calibrators gave the same numbers, but the LoRA models were trained only once per seed. The reliability diagrams pool severities 3 to 5 and were not made for each severity as planned, and I followed each group's NLL across severities but not its ECE. The plan also listed the debiased ECE estimator of Kumar et al.\ \cite{kumar2019verified}, which I computed but do not report, and worst groups for each HAM10000 attribute separately, where I only report the worst of all four groups.
+
+%% =========================================================
+\section{Project Execution}
+\label{sec:plan}
+
+\subsection{Six-Week Plan and What Happened}
+
+Table~\ref{tab:plan} compares the six-week plan from my Phase 2 proposal with what happened. The experiments ran late. Data loading and the probes were finished in Week 3 instead of Week 1, and most of the remaining runs were done on November 21 and 22, in Week 5.
 
 \subsection{Go/No-Go Decision and Scope}
 \label{sec:gonogo}
