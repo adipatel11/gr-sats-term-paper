@@ -15,7 +15,7 @@ The experiments are finished and the paper is written. What's left for Phase 3 i
 
 ## Main results (worst-group NLL, held-out corruption families, severity 3 to 5, mean of 3 seeds)
 
-TS-WG and SATS-avg per setting are not in the paper, the other columns match Table 6. The paper also has TS with Gaussian noise, multi-domain TS, cluster-wise TS and the oracles.
+TS-WG and SATS-avg per setting are not in the paper, the other columns match Table 7 (it was Table 6 before the complexity table was added on Nov 26). The paper also has TS with Gaussian noise, multi-domain TS, cluster-wise TS and the oracles.
 
 | Setting | none | TS clean | TS Gauss | TS corr | TS-WG | DAC | AAR | SATS-avg | GR-SATS |
 |---|---|---|---|---|---|---|---|---|---|
@@ -81,6 +81,7 @@ Phase 3 poster is due Thursday, Nov 26, 2026 at 11:59pm (Phase 3 Canvas Discussi
 
 1. Done Nov 23: `main.tex` updated on Overleaf and the new PDF is here. Last edits: 5.4 (TS with corruptions is no longer called the strongest simple baseline), Table 2 row 2, 7.1 (NLL is still higher under corruption than on clean images), and the Figure 4 alt text and Figure 6 caption. Later the same day: 6.3 (excess NLL gives up all of the group-loss gain) and 7.5 (debiased ECE and per-attribute worst groups were planned but not reported). After that, 6.4 (the ECE gap between the sexes and between skin types goes up compared with TS corr) and y-axis labels on every panel of Figures 4, 5 and 6. The tables did not change.
    - Done Nov 24, on Overleaf and in the PDF here (15 pages): Dr. Kurma asked for at least four result figures with trends against the baselines, plus one process figure. Added `brier`, `families` and `tradeoff` (Figures 3, 7 and 9, Sections 6.1 and 6.4). With the severity figure (now Figure 5) that makes four. The process figure is Figure 2. Old Figures 3 to 6 are now 4, 5, 6 and 8.
+   - Done Nov 26, in `main.tex` and the new PDF here: Dr. Kurma's items 6 and 7. New Section 4.4 "Computational Complexity" with Table 3 (cost of each calibrator). Table 1 now has a GR-SATS (this work) row and Shift / Groups / Post-hoc columns, and GR-SATS is the only row with all three. Every later table moved up by one (old Tables 3 to 9 are now 4 to 10). Table 1 is `[tp]` now, so check on Overleaf that it still lands near Section 2.
 2. Make the poster (single-slide PPTX), figures from `code/figures/` only. `framework.png` is the method diagram and `taxonomy.png` is the literature figure. Its numbers in brackets are the paper's references.
 3. Write and rehearse the 15-minute talk. Check on Canvas if it's live or recorded.
 

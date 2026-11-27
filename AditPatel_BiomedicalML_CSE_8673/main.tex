@@ -33,6 +33,7 @@
 %% Left-aligned table columns. P{width} has a fixed width and L stretches.
 \newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
 \newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
 
 %% Let a column end short instead of stretching the space between blocks.
 \raggedbottom
@@ -179,37 +180,39 @@ This section condenses my Phase 1 survey. Starting from the two seed papers, DAC
   \label{fig:taxonomy}
 \end{figure}
 
-Figure~\ref{fig:taxonomy} sorts the methods by when calibration happens and by what a post-hoc calibrator can depend on. Train-time methods change the loss, add mixup, or use ensembles and dropout, and they all need retraining. Of these, only Cluster-Focal \cite{shui2023clusterfocal} aims at group calibration, and group-robust training can even make uncertainty estimates worse \cite{mehta2023evaluating}. Global post-hoc methods such as temperature scaling (TS) \cite{guo2017calibration} fit one small mapping on clean validation data. Shift-aware post-hoc methods expose the calibrator to perturbed or out-of-distribution (OOD) data \cite{tomani2021posthoc,roschewitz2025where}, learn from several source domains \cite{gong2021confidence,yu2022multidomain}, or let the temperature depend on feature density, as DAC does with nearest-neighbor distances and AAR does with atypicality \cite{tomani2023dac,yuksekgonul2023atypicality}. Group-aware post-hoc methods calibrate within known groups \cite{hebertjohnson2018multicalibration,shen2025calin} or within clusters of embeddings when group labels are missing \cite{salvador2022faircal,yang2023beyond}. For the most part these lines of work stayed separate. Shift-aware calibrators appeared from 2020 on, while fairness work moved to worst-group training \cite{sagawa2020groupdro}. More recent papers question some of this, for example Roschewitz et al.\ found that calibrators built for shift do not reliably beat simpler ones \cite{roschewitz2025where}. None of the papers DAC cites deals with patient groups, and none of the papers FairMedFM cites is a calibration method. Table~\ref{tab:literature} compares ten representative works.
+Figure~\ref{fig:taxonomy} sorts the methods by when calibration happens and by what a post-hoc calibrator can depend on. Train-time methods change the loss, add mixup, or use ensembles and dropout, and they all need retraining. Of these, only Cluster-Focal \cite{shui2023clusterfocal} aims at group calibration, and group-robust training can even make uncertainty estimates worse \cite{mehta2023evaluating}. Global post-hoc methods such as temperature scaling (TS) \cite{guo2017calibration} fit one small mapping on clean validation data. Shift-aware post-hoc methods expose the calibrator to perturbed or out-of-distribution (OOD) data \cite{tomani2021posthoc,roschewitz2025where}, learn from several source domains \cite{gong2021confidence,yu2022multidomain}, or let the temperature depend on feature density, as DAC does with nearest-neighbor distances and AAR does with atypicality \cite{tomani2023dac,yuksekgonul2023atypicality}. Group-aware post-hoc methods calibrate within known groups \cite{hebertjohnson2018multicalibration,shen2025calin} or within clusters of embeddings when group labels are missing \cite{salvador2022faircal,yang2023beyond}. For the most part these lines of work stayed separate. Shift-aware calibrators appeared from 2020 on, while fairness work moved to worst-group training \cite{sagawa2020groupdro}. More recent papers question some of this, for example Roschewitz et al.\ found that calibrators built for shift do not reliably beat simpler ones \cite{roschewitz2025where}. None of the papers DAC cites deals with patient groups, and none of the papers FairMedFM cites is a calibration method. Table~\ref{tab:literature} compares ten representative works with mine. GR-SATS is the only row that is tested under shift, reports results by patient group, and fixes calibration post hoc, which is the empty leaf in Figure~\ref{fig:taxonomy}.
 
-\begin{table*}[t]
-  \caption{Comparison of representative related works. The two seed papers are in bold.}
+\begin{table*}[tp]
+  \caption{Comparison of representative state-of-the-art works with this work (last row). The two seed papers are in bold. Shift means the paper tests under distribution shift, Groups means it reports results by patient or demographic group, and Post-hoc means it proposes a calibrator that needs no retraining.}
   \label{tab:literature}
   \scriptsize
   \setlength{\tabcolsep}{3pt}
   \renewcommand{\arraystretch}{1.1}
-  \begin{tabularx}{\textwidth}{@{}P{1.75cm}P{2.3cm}LP{1.9cm}P{1.85cm}LP{2.55cm}@{}}
+  \begin{tabularx}{\textwidth}{@{}P{1.7cm}P{2.0cm}LP{1.6cm}P{1.6cm}LP{2.2cm}C{0.75cm}C{0.85cm}C{1.0cm}@{}}
     \toprule
-    \textbf{Reference} & \textbf{Dataset} & \textbf{Method} & \textbf{Task} & \textbf{Metrics} & \textbf{Key finding} & \textbf{Limitation or gap} \\
+    \textbf{Reference} & \textbf{Dataset} & \textbf{Method} & \textbf{Task} & \textbf{Metrics} & \textbf{Key finding} & \textbf{Limitation or gap} & \textbf{Shift} & \textbf{Groups} & \textbf{Post-hoc} \\
     \midrule
-    Ovadia 2019 \cite{ovadia2019trust} & MNIST, CIFAR-10-C, ImageNet-C, text, ad clicks, genomics & Benchmark of uncertainty methods such as TS, dropout, and ensembles & Classification under dataset shift & Accuracy, ECE, Brier, NLL & Calibration gets worse as shift grows, and ensembles hold up best & No groups and no medical images \\
+    Ovadia 2019 \cite{ovadia2019trust} & MNIST, CIFAR-10-C, ImageNet-C, text, ad clicks, genomics & Benchmark of uncertainty methods such as TS, dropout, and ensembles & Classification under dataset shift & Accuracy, ECE, Brier, NLL & Calibration gets worse as shift grows, and ensembles hold up best & No groups and no medical images & Yes & No & No \\
     \addlinespace
-    Tomani 2021 \cite{tomani2021posthoc} & CIFAR-10, ImageNet, ObjectNet & Post-hoc calibrators fit on a validation set perturbed with Gaussian noise & Image classification under domain drift & ECE, entropy & Standard calibrators are overconfident under drift, and the perturbation reduces this & One global mapping, assumes a noise-like shift \\
+    Tomani 2021 \cite{tomani2021posthoc} & CIFAR-10, ImageNet, ObjectNet & Post-hoc calibrators fit on a validation set perturbed with Gaussian noise & Image classification under domain drift & ECE, entropy & Standard calibrators are overconfident under drift, and the perturbation reduces this & One global mapping, assumes a noise-like shift & Yes & No & Yes \\
     \addlinespace
-    \textbf{DAC} 2023 \cite{tomani2023dac} & CIFAR-10/100 and ImageNet with corruptions, ObjectNet-OOD & Per-image temperature from $k$-NN distances in several hidden layers & Image classification under shift and OOD & ECE, Brier, and others & Lowers ECE under corruption while keeping in-domain calibration & Average calibration only, no groups, no medical data \\
+    \textbf{DAC} 2023 \cite{tomani2023dac} & CIFAR-10/100 and ImageNet with corruptions, ObjectNet-OOD & Per-image temperature from $k$-NN distances in several hidden layers & Image classification under shift and OOD & ECE, Brier, and others & Lowers ECE under corruption while keeping in-domain calibration & Average calibration only, no groups, no medical data & Yes & No & Yes \\
     \addlinespace
-    AAR 2023 \cite{yuksekgonul2023atypicality} & ImageNet, CIFAR, MNLI, Fitzpatrick17k & Logit scale quadratic in atypicality, plus a bias for each class & Classification, including 9-class skin lesions & ECE, accuracy & Better worst skin-tone group without group labels & Fit for average NLL, clean data only \\
+    AAR 2023 \cite{yuksekgonul2023atypicality} & ImageNet, CIFAR, MNLI, Fitzpatrick17k & Logit scale quadratic in atypicality, plus a bias for each class & Classification, including 9-class skin lesions & ECE, accuracy & Better worst skin-tone group without group labels & Fit for average NLL, clean data only & No & Yes & Yes \\
     \addlinespace
-    FairCal 2022 \cite{salvador2022faircal} & RFW and BFW face pairs & One calibration map per k-means cluster of embeddings & Face verification & Accuracy, false positive rate gaps, group calibration & Fairer calibration without sensitive attributes or retraining & Faces only, no shift \\
+    FairCal 2022 \cite{salvador2022faircal} & RFW and BFW face pairs & One calibration map per k-means cluster of embeddings & Face verification & Accuracy, false positive rate gaps, group calibration & Fairer calibration without sensitive attributes or retraining & Faces only, no shift & No & Yes & Yes \\
     \addlinespace
-    Cluster-Focal 2023 \cite{shui2023clusterfocal} & HAM10000, multiple sclerosis MRI & Cluster by calibration gap, then train with a group-wise focal loss & Skin lesions, multiple sclerosis activity & Worst-group quantile ECE, accuracy, F1 & Lower worst-subgroup calibration error with similar accuracy & Needs retraining, clean test data only \\
+    Cluster-Focal 2023 \cite{shui2023clusterfocal} & HAM10000, multiple sclerosis MRI & Cluster by calibration gap, then train with a group-wise focal loss & Skin lesions, multiple sclerosis activity & Worst-group quantile ECE, accuracy, F1 & Lower worst-subgroup calibration error with similar accuracy & Needs retraining, clean test data only & No & Yes & No \\
     \addlinespace
-    \textbf{FairMedFM} 2024 \cite{jin2024fairmedfm} & 17 datasets, including HAM10000 and CheXpert & 20 foundation models with LP, parameter-efficient fine-tuning, and CLIP-based adaptation & Classification and segmentation & AUC, AUC gap, equalized odds, ECE gap, Dice & Bias is common, and mitigation helps little & Clean in-distribution tests only, no calibration method \\
+    \textbf{FairMedFM} 2024 \cite{jin2024fairmedfm} & 17 datasets, including HAM10000 and CheXpert & 20 foundation models with LP, parameter-efficient fine-tuning, and CLIP-based adaptation & Classification and segmentation & AUC, AUC gap, equalized odds, ECE gap, Dice & Bias is common, and mitigation helps little & Clean in-distribution tests only, no calibration method & No & Yes & No \\
     \addlinespace
-    MedMNIST-C 2024 \cite{disalvo2024medmnistc} & 12 MedMNIST+ datasets & Modality-specific corruptions at five severities & Classification robustness & Balanced error, AUC & Corruptions cut performance, and corruption augmentation helps & No calibration metrics, no groups \\
+    MedMNIST-C 2024 \cite{disalvo2024medmnistc} & 12 MedMNIST+ datasets & Modality-specific corruptions at five severities & Classification robustness & Balanced error, AUC & Corruptions cut performance, and corruption augmentation helps & No calibration metrics, no groups & Yes & No & No \\
     \addlinespace
-    Roschewitz 2025 \cite{roschewitz2025where} & 8 tasks with natural shift, 4 of them medical & Comparison of post-hoc and in-training calibration & Image classification under natural shift & ECE, Brier & OOD exposure is most robust, and shift-specific methods do not reliably beat simple ones & No subgroups, no graded corruption \\
+    Roschewitz 2025 \cite{roschewitz2025where} & 8 tasks with natural shift, 4 of them medical & Comparison of post-hoc and in-training calibration & Image classification under natural shift & ECE, Brier & OOD exposure is most robust, and shift-specific methods do not reliably beat simple ones & No subgroups, no graded corruption & Yes & No & No \\
     \addlinespace
-    Dominique 2025 \cite{dominique2025calibration} & ISIC 2020, PROVE-AI & Audit of the top three ISIC 2020 models & Melanoma detection & AUC, calibration by group & Models overestimate risk and are miscalibrated across sex, skin tone, and age & Audit only, no fix \\
+    Dominique 2025 \cite{dominique2025calibration} & ISIC 2020, PROVE-AI & Audit of the top three ISIC 2020 models & Melanoma detection & AUC, calibration by group & Models overestimate risk and are miscalibrated across sex, skin tone, and age & Audit only, no fix & Yes & Yes & No \\
+    \midrule
+    \textbf{GR-SATS} (this work) & HAM10000, Fitzpatrick17k-C, 15 MedMNIST-C corruptions at five severities & Inverse temperature linear in a standardized $k$-NN shift score, fit to minimize the worst group's NLL & Malignancy under held-out corruption families & Worst-group NLL and Brier, per-group NLL, ECE, AUC & Lower worst-group NLL than TS with corruptions, DAC, and AAR, with intervals that exclude zero & Synthetic corruptions only, some cost to the best-off group on HAM10000 & Yes & Yes & Yes \\
     \bottomrule
   \end{tabularx}
 \end{table*}
@@ -364,6 +367,41 @@ I kept the calibrator this small because the smallest group in Fitzpatrick17k ha
     2. Shift signal that transfers & Standardized, clipped log $k$-NN distance (C1), leave-one-family-out testing & Gives a unitless score that grows with severity and stays in the fitted range & Large gains on unseen noise and on HAM10000 digital corruptions, small differences on the other families, and smaller gains for LoRA than for LP \\
     \addlinespace
     3. Small groups & Cross-fitting, proper scores, paired bootstrap over source images & Uses every pooled image for testing and gives intervals that are not too narrow & Intervals that exclude zero for the primary comparisons, while skin types V-VI stay uncertain \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{Computational Complexity}
+\label{sec:complexity}
+
+Let $N_b$ be the size of the reference bank, which is the training split (8,164 images for HAM10000 and 7,779 for Fitzpatrick17k-C), $F = 768$ the feature dimension of ViT-B, $N$ the number of fitting rows, $G = |\mathcal{G}|$ the number of groups (4 or 3), and $I$ the number of solver iterations (at most 1,000). Each fit uses about 80\% of the pool and 55 to 65 corrupted copies of each image, so $N$ is about 80,000 to 94,000 on HAM10000 and 149,000 to 175,000 on Fitzpatrick17k-C. Table~\ref{tab:complexity} compares the cost of GR-SATS with the baselines.
+
+\textbf{Shift score.} The exact $k$-NN distance of one image is one product of its normalized feature with the bank followed by a top-$k$ search, which costs $O(N_b F)$ time and $O(N_b)$ memory. That is about 6.3 million multiply-adds on HAM10000. A ViT-B forward pass at 224 pixels costs about 17 billion multiply-adds for BiomedCLIP's 197 tokens and 23 billion for DINOv2's 257 tokens (12 layers of about $12PF^2 + 2P^2F$ for $P$ tokens), so the score adds less than 0.04\% to the forward pass that every method needs. In the experiments I compute the score once for each model and each of the $76n$ images (the $n$ clean pool images and their 75 corrupted copies), which is $O(76\, n N_b F)$ in total, and reuse it for every fold, held-out family, and score-based method. The full DAC repeats the search in each hidden layer it uses, so its score costs $O(N_b F)$ per layer.
+
+\textbf{Fitting.} Each SLSQP iteration for Eq.~\eqref{eq:objective} computes $\beta_\theta(s)\, z$ for every row and then the $G$ weighted group losses and their gradients, which takes $O(GN)$ time because $\theta$ has only two entries. The solver's own step works on three variables ($a_0$, $a_1$, and the epigraph variable $t$) and $G + 2$ constraints, so it does not grow with $N$. A GR-SATS fit therefore takes $O(IGN)$ time and $O(GN)$ memory for the group weights, which is at most about 4 MB here. The problem is convex, so one start is enough. The excess-loss version first solves one problem per group, which adds another $O(IGN)$. DAC-WG has the same cost per start but is not convex, so I run it from two starts and it can still stop at a local optimum.
+
+\textbf{Prediction.} Once $z(x)$ and $s(x)$ are known, Eq.~\eqref{eq:calib} needs a log, a clip, a multiplication, and a sigmoid, so it is $O(1)$ per image. Besides the bank, which the score needs anyway (about 25 MB in 32-bit floats for HAM10000), GR-SATS stores only $a_0$, $a_1$, $m$, $r$, $s_{\min}$, and $s_{\max}$.
+
+\textbf{Whole experiment.} Cross-fitting fits every calibrator 25 times per model (5 folds times 5 held-out families), so with 8 settings and three seeds there are 600 fits of each method. The paired bootstrap adds $O(B n_t)$ for $B = 2{,}000$ resamples and $n_t$ test rows. Train-time methods such as GroupDRO or Cluster-Focal would instead need $O(E\, N_{\text{train}}\, C)$ for $E$ epochs and a forward and backward cost $C$ per image, repeated for every attribute and adaptation strategy. For comparison, LoRA trains only 294,912 adapter weights and a 769-weight head (about 0.34\% of the 86 million weights in ViT-B), but it still backpropagates through the whole backbone, and the 12 LoRA models took about 2.4 T4 hours. Every post-hoc calibrator here fits on saved logits and distances on a CPU in seconds to minutes per model.
+
+\begin{table}[t]
+  \caption{Cost of each calibrator, apart from the backbone forward pass that every method shares. Extra cost is the added work per test image, and fit is the time for one calibrator fit. AAR's $O(N_b F^2 + F^3)$ term for the atypicality model is paid once per model. $K = 8$ clusters fit on $N_s = 20{,}000$ rows for $R$ iterations, and $\dagger$ marks the oracle that needs test-time group labels.}
+  \label{tab:complexity}
+  \scriptsize
+  \setlength{\tabcolsep}{3pt}
+  \renewcommand{\arraystretch}{1.1}
+  \begin{tabularx}{\columnwidth}{@{}P{1.9cm}P{1.25cm}LP{0.85cm}P{0.75cm}@{}}
+    \toprule
+    \textbf{Method} & \textbf{Extra cost} & \textbf{Fit} & \textbf{Params} & \textbf{Convex} \\
+    \midrule
+    TS (all three) & None & $O(IN)$ & 1 & Yes \\
+    DAC (final layer) & $O(N_b F)$ & $O(IN)$ & 2 & No \\
+    DAC-WG & $O(N_b F)$ & $O(IGN)$, two starts & 2 & No \\
+    AAR & $O(F^2)$ & $O(N_b F^2 + F^3 + IN)$ & 4 & Yes \\
+    Multi-domain TS & $O(F)$ & $O(IN + NF^2 + F^3)$ & 769 & Yes \\
+    Cluster-wise TS & $O(KF)$ & $O(R K N_s F + NKF + IN)$ & 8 & No \\
+    Group-wise TS$^\dagger$ & None & $O(IN)$ & 1 per cell & Yes \\
+    \textbf{GR-SATS} & $O(N_b F)$ & $O(IGN)$ & 2 & Yes \\
     \bottomrule
   \end{tabularx}
 \end{table}
